@@ -202,7 +202,8 @@ canvas{display:block;width:100%;touch-action:none}
 .quick button{background:none;border:none;color:var(--silt);text-decoration:underline;padding:4px 0;font-size:14px}
 
 .radio{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;gap:8px;align-items:center;background:var(--hull);border:1px solid var(--line);border-radius:10px;padding:6px 8px;margin-bottom:10px}
-.radio .rtxt{min-width:0;display:grid;line-height:1.15}
+.radio .rtxt{min-width:0;display:grid;line-height:1.15;cursor:pointer}
+.plrow h3{font-size:15px}
 .radio .rtxt .eyebrow{font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .radio b{font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .radio .btn{padding:6px 10px;font-size:13px}
@@ -235,7 +236,7 @@ canvas{display:block;width:100%;touch-action:none}
     </div>
     <p class="hint">Tap a building to walk there, or hold the arrows.</p>
     <div class="quick" id="quick"><span>Skip the walk:</span><button data-go="tackle">Tackle</button><button data-go="club" id="qClub">Club</button><button data-go="store">Corner Stop</button><button data-go="cabin">Cabin</button><button data-go="launch">Boat Launch</button></div>
-    <p class="note">Lures are the real Stocklin Lures lineup, hand-made in Bellingham. See <a href="https://www.stocklinlures.com" target="_blank" rel="noopener">stocklinlures.com</a>. Fish stats, run timing and river regulations in this game are simplified for fun. Check the real WDFW regs before you fish.</p>
+    <p class="note">Lures are the real Stocklin Lures Silty Spoons, handcrafted in Washington. See <a href="https://www.stocklinlures.com/" target="_blank" rel="noopener">StocklinLures.com</a>. Fish stats, run timing and river regulations in this game are simplified for fun. Check the real WDFW regulations before you fish.</p>
   </section>
 
   <section id="scMap" hidden>
@@ -596,13 +597,53 @@ function mSteel(t, m0, m, dur, v=0.07){ const g = hold(t, 0.03, dur, 0.2, v), f 
   o.frequency.setValueAtTime(mtof(m0), t); o.frequency.exponentialRampToValueAtTime(mtof(m), t + 0.14); o.connect(f); o.start(t); o.stop(t + dur + 0.3);
   const l = AC.createOscillator(), lg = AC.createGain(); l.frequency.value = 5; lg.gain.value = 14; l.connect(lg).connect(o.detune); l.start(t); l.stop(t + dur + 0.3); }
 function mBlip(t){ const s = AC.createBufferSource(); s.buffer = M.noise; const f = AC.createBiquadFilter(); f.type = 'bandpass'; f.Q.value = 6; f.frequency.setValueAtTime(300, t); f.frequency.exponentialRampToValueAtTime(3500, t + 0.35); s.connect(f).connect(env(t, 0.01, 0.35, 0.18)); s.start(t); s.stop(t + 0.4); vo('sine', 1320, t + 0.3, 0.08, env(t + 0.3, 0.005, 0.08, 0.05)); }
-function melNote(scale, base){ M.mel = clamp(M.mel + pick([-2,-1,-1,1,1,2]), -3, 8); const L = scale.length, deg = ((M.mel % L) + L) % L; return base + scale[deg] + 12*Math.floor(M.mel/L); }
+let MR = 1;
+const rr = () => { MR = (Math.imul(MR, 1664525) + 1013904223) >>> 0; return MR / 4294967296; };
+const rp = a => a[Math.floor(rr()*a.length)];
+const PLAYLIST = [
+  {title:'Jet Sled Voltage', artist:'Smolt Machine', style:'electronic', bpm:124, key:45, prog:0, seed:101},
+  {title:'Tailout Shuffle', artist:'Two-Rod Terry & the Plunkers', style:'country', bpm:110, key:43, prog:0, seed:202},
+  {title:'Chum Run Remix', artist:'Big Chum Beats', style:'hiphop', bpm:88, key:45, prog:0, seed:303},
+  {title:'Steelhead Swing', artist:'The Silt Creek Quartet', style:'jazz', bpm:148, key:41, prog:0, seed:404},
+  {title:'Glacial Milk', artist:'Silty Circuits', style:'electronic', bpm:118, key:47, prog:1, seed:505},
+  {title:'Gravel Bar Boogie', artist:'The Gravel Bar Boys', style:'country', bpm:114, key:45, prog:1, seed:606},
+  {title:'Adipose Clipped', artist:'MC Adipose', style:'hiphop', bpm:86, key:48, prog:1, seed:707},
+  {title:'Eddy Line Blues', artist:'Eddy Line Trio', style:'jazz', bpm:132, key:43, prog:1, seed:808},
+  {title:'Radioactive Drift', artist:'DJ Wobbler', style:'electronic', bpm:126, key:46, prog:2, seed:909},
+  {title:'Plunker\'s Hoedown', artist:'Hollerin\' Hank', style:'country', bpm:116, key:47, prog:2, seed:1010},
+  {title:'Boat Ramp Cypher', artist:'Lil Smolt', style:'hiphop', bpm:90, key:46, prog:2, seed:1111},
+  {title:'Hatchery Bop', artist:'Tailout Trio', style:'jazz', bpm:160, key:46, prog:0, seed:1212},
+  {title:'Tidewater Pulse', artist:'Smolt Machine', style:'electronic', bpm:121, key:48, prog:1, seed:1313},
+  {title:'Rainy Day Two-Step', artist:'Two-Rod Terry & the Plunkers', style:'country', bpm:104, key:48, prog:1, seed:1414},
+  {title:'Silt Creek Beat Tape', artist:'Big Chum Beats', style:'hiphop', bpm:84, key:50, prog:0, seed:1515},
+  {title:'Low Water Standard', artist:'The Silt Creek Quartet', style:'jazz', bpm:138, key:44, prog:1, seed:1616},
+  {title:'Night Bite Protocol', artist:'DJ Wobbler', style:'electronic', bpm:119, key:50, prog:2, seed:1717},
+  {title:'Corner Stop Ramble', artist:'The Gravel Bar Boys', style:'country', bpm:108, key:50, prog:0, seed:1818},
+  {title:'Fog Bank Flow', artist:'MC Adipose', style:'hiphop', bpm:92, key:45, prog:2, seed:1919},
+  {title:'Sasquatch Stomp', artist:'Eddy Line Trio', style:'jazz', bpm:154, key:48, prog:0, seed:2020},
+];
+let PL_ORDER = null;
+function buildOrder(){
+  const by = {}; PLAYLIST.forEach((s2, i) => (by[s2.style] = by[s2.style] || []).push(i));
+  Object.values(by).forEach(a => a.sort(() => Math.random() - 0.5));
+  const out = []; let last = null;
+  while (out.length < PLAYLIST.length){
+    const styles = Object.keys(by).filter(k => by[k].length && k !== last).sort(() => Math.random() - 0.5);
+    const k = styles[0] || Object.keys(by).find(k2 => by[k2].length);
+    out.push(by[k].pop()); last = k;
+  }
+  return out;
+}
+function melNote(scale, base){ M.mel = clamp(M.mel + rp([-2,-1,-1,1,1,2]), -3, 8); const L = scale.length, deg = ((M.mel % L) + L) % L; return base + scale[deg] + 12*Math.floor(M.mel/L); }
 
-function newTrack(){
-  const opts = Object.keys(MUS).filter(k => k !== M.style);
-  M.style = pick(opts); const d = MUS[M.style];
-  M.bpm = rand(d.bpm[0], d.bpm[1]); M.key = pick(d.keys); M.prog = pick(d.progs); M.bars = Math.max(48, Math.round(3.5*M.bpm/4/16)*16); M.mel = 2;
-  M.name = `${pick(TITLE_A)} ${pick(d.words)}`; M.artist = pick(d.artists);
+function newTrack(idx){
+  if (!PL_ORDER) PL_ORDER = buildOrder();
+  if (idx == null){ M.pos = ((M.pos == null ? -1 : M.pos) + 1) % PL_ORDER.length; idx = PL_ORDER[M.pos]; }
+  else M.pos = PL_ORDER.indexOf(idx);
+  const song = PLAYLIST[idx], d = MUS[song.style];
+  M.song = idx; M.style = song.style; M.bpm = song.bpm; M.key = song.key; M.prog = d.progs[song.prog % d.progs.length];
+  M.bars = Math.max(48, Math.round(3.5*M.bpm/4/16)*16); M.mel = 2; M.lastF = 0; MR = song.seed;
+  M.name = song.title; M.artist = song.artist;
   if (M.out && AC) M.out.gain.setTargetAtTime(MIXV[M.style], AC.currentTime, 0.1);
   updateRadio();
 }
@@ -618,7 +659,7 @@ function playStep(t){
     const ap = [0,1,2,1,0,2,1,2, 0,1,2,3,2,1,0,2][step], ti = tones[ap % tones.length] + (ap >= tones.length ? 12 : 0);
     mLead(t, root + 12 + ti + (step >= 8 ? 12 : 0), s16*0.8, 0.035, 'square', 700 + (bar % 8)*260);
     if (step === 0) mPad(t, tones.map(i => root + 12 + i), barDur*0.95, 0.028);
-    if (bar >= 8 && bar < 14 && [0,3,6,10,12].includes(step) && Math.random() < 0.6) mLead(t, melNote(PENT_MIN, root + 24), s16*2, 0.05, 'sawtooth', 2600, 8);
+    if (bar >= 8 && bar < 14 && [0,3,6,10,12].includes(step) && rr() < 0.6) mLead(t, melNote(PENT_MIN, root + 24), s16*2, 0.05, 'sawtooth', 2600, 8);
     if (bar === 15 && step >= 8 && step % 2 === 0) mSnare(t, 0.08 + step*0.012, 1500);
   }
   if (st === 'country'){
@@ -628,12 +669,12 @@ function playStep(t){
     if (step === 0) mBass(t, bassReg(root), s16*3, 'triangle', 900, 0.6);
     if (step === 8) mBass(t, bassReg(root + 7), s16*3, 'triangle', 900, 0.6);
     if (step === 14 && bar % 2) mBass(t, bassReg(root + 4), s16*1.5, 'triangle', 900, 0.45);
-    if (step === 4 || step === 12 || (step === 14 && Math.random() < 0.5)){
+    if (step === 4 || step === 12 || (step === 14 && rr() < 0.5)){
       const vs = [root + 12, ...tones.map(i => root + 12 + i), root + 24], up = step === 14;
       (up ? vs.slice().reverse() : vs).forEach((m, k) => mPluck(t + k*0.011, m, 0.28, up ? 0.04 : 0.055));
     }
-    if ((bar % 8) >= 4 && [0,6,8,12].includes(step) && Math.random() < 0.65){ const m = melNote(PENT_MAJ, root + 24); mSteel(t, M.lastF || m - 2, m, s16*3, 0.06); M.lastF = m; }
-    if (bar >= 8 && bar < 12 && step % 2 === 0 && Math.random() < 0.7) mLead(t, melNote(PENT_MAJ, root + 24), s16*1.8, 0.04, 'sawtooth', 2200, 18);
+    if ((bar % 8) >= 4 && [0,6,8,12].includes(step) && rr() < 0.65){ const m = melNote(PENT_MAJ, root + 24); mSteel(t, M.lastF || m - 2, m, s16*3, 0.06); M.lastF = m; }
+    if (bar >= 8 && bar < 12 && step % 2 === 0 && rr() < 0.7) mLead(t, melNote(PENT_MAJ, root + 24), s16*1.8, 0.04, 'sawtooth', 2200, 18);
   }
   if (st === 'hiphop'){
     const sw = step % 2 === 1 ? s16*0.28 : 0, tt = t + sw;
@@ -643,8 +684,8 @@ function playStep(t){
     if ((step === 14 || step === 15) && bar % 4 === 3) mHat(tt, 0.04);
     if (step === 0) mKeys(tt, tones.map(i => root + 12 + i), barDur*0.85, 0.045);
     if (step === 14 && bar % 2 === 0) mKeys(tt, tones.slice(1).map(i => root + 12 + i), s16*1.5, 0.03);
-    if (bar >= 4 && [2,6,11].includes(step) && Math.random() < 0.5) mKeys(tt, [melNote(PENT_MIN, root + 24)], s16*2, 0.04);
-    if (Math.random() < 0.3) mCrackle(t + Math.random()*s16);
+    if (bar >= 4 && [2,6,11].includes(step) && rr() < 0.5) mKeys(tt, [melNote(PENT_MIN, root + 24)], s16*2, 0.04);
+    if (Math.random() < 0.3) mCrackle(t + Math.random()*s16); /* crackle stays random */
   }
   if (st === 'jazz'){
     if (step % 2) return;
@@ -652,14 +693,14 @@ function playStep(t){
     if ([0,4,6,8,12,14].includes(step)) mRide(tt, step === 4 || step === 12 ? 0.08 : 0.055);
     if (step === 4 || step === 12) mHat(tt, 0.05);
     if (step % 4 === 0) mKick(tt, 0.1);
-    if (step === 10 && Math.random() < 0.25) mSnare(tt, 0.05, 1800);
+    if (step === 10 && rr() < 0.25) mSnare(tt, 0.05, 1800);
     if (step % 4 === 0){
       const nx = M.prog[(bar + 1) % M.prog.length], nr = M.key + nx[0];
-      const m = step === 0 ? root : step === 4 ? root + pick([tones[1], tones[2]]) : step === 8 ? root + pick([tones[2], tones[3] || 12]) : nr + pick([-1, 1]);
+      const m = step === 0 ? root : step === 4 ? root + rp([tones[1], tones[2]]) : step === 8 ? root + rp([tones[2], tones[3] || 12]) : nr + rp([-1, 1]);
       mUpright(tt, bassReg(m), 0.62);
     }
-    if ((step === 0 && Math.random() < 0.5) || (step === 6 && Math.random() < 0.7) || (step === 14 && Math.random() < 0.3)) mKeys(tt, [root + 12 + tones[1], root + 12 + (tones[3] || 12), root + 26], s16*1.6, 0.04);
-    if ((bar % 4) !== 3 && bar >= 2 && Math.random() < 0.55) mLead(tt, melNote(BOP, M.key + 19), s16*1.8, 0.045, 'sawtooth', 1700, 12);
+    if ((step === 0 && rr() < 0.5) || (step === 6 && rr() < 0.7) || (step === 14 && rr() < 0.3)) mKeys(tt, [root + 12 + tones[1], root + 12 + (tones[3] || 12), root + 26], s16*1.6, 0.04);
+    if ((bar % 4) !== 3 && bar >= 2 && rr() < 0.55) mLead(tt, melNote(BOP, M.key + 19), s16*1.8, 0.045, 'sawtooth', 1700, 12);
   }
 }
 function schedMusic(){
@@ -674,7 +715,7 @@ function schedMusic(){
 function startMusic(){
   if (M.on || !AC || !S.music) return;
   M.on = true; musicBus();
-  newTrack(); M.out.gain.setValueAtTime(MIXV[M.style], AC.currentTime); M.step = 0; M.bar = 0; M.next = AC.currentTime + 0.1;
+  newTrack(M.queued); M.queued = null; M.out.gain.setValueAtTime(MIXV[M.style], AC.currentTime); M.step = 0; M.bar = 0; M.next = AC.currentTime + 0.1;
   M.timer = setInterval(schedMusic, 25); updateRadio();
 }
 function stopMusic(){
@@ -682,16 +723,23 @@ function stopMusic(){
   if (M.out && AC){ const g = M.out; g.gain.setTargetAtTime(0.0001, AC.currentTime, 0.05); setTimeout(() => { try { g.disconnect(); } catch(e){} }, 600); M.out = null; }
   updateRadio();
 }
-function skipTrack(){ if (!M.on){ S.music = true; save(); ac(); startMusic(); return; } M.bar = 0; M.step = 0; newTrack(); M.next = AC.currentTime + 0.5; mBlip(AC.currentTime + 0.05); }
+function skipTrack(idx){ if (!M.on){ S.music = true; save(); ac(); M.queued = idx; startMusic(); return; } M.bar = 0; M.step = 0; newTrack(idx); M.next = AC.currentTime + 0.5; mBlip(AC.currentTime + 0.05); }
+function openPlaylist(){
+  const rows = PLAYLIST.map((sg, i) => `<button class="lure plrow ${M.on && M.song === i ? 'eq' : ''}" data-song="${i}" style="grid-template-columns:28px minmax(0,1fr) auto;text-align:left;width:100%">
+    <span class="mono muted">${String(i + 1).padStart(2,'0')}</span><span style="min-width:0"><h3>${sg.title}</h3><small>${sg.artist}</small></span><span class="chip">${MUS[sg.style].label}</span></button>`).join('');
+  openSheet(head('Silt Creek Radio', '20-song playlist') + `<p class="muted" style="margin:0">Shuffles through all 20 without repeating a style back to back. Tap a song to play it.</p>` + rows);
+  $('#sheetCard').onclick = e => { const b2 = e.target.closest('[data-song]'); if (!b2) return; ac(); skipTrack(+b2.dataset.song); closeSheet(); };
+}
 function updateRadio(){
   const r = document.getElementById('radio'); if (!r) return;
   r.classList.toggle('on', M.on);
-  $('#rStyle').textContent = M.on ? MUS[M.style].label : 'Off';
+  $('#rStyle').textContent = M.on ? `${MUS[M.style].label} · ${M.pos + 1}/${PLAYLIST.length}` : 'Off';
   $('#rTitle').textContent = M.on ? `“${M.name}” · ${M.artist}` : (S.music ? 'Tap anywhere to start the music' : 'Music is off');
   $('#rPlay').textContent = M.on ? 'Pause' : 'Play';
 }
 $('#rPlay').addEventListener('click', () => { if (M.on){ S.music = false; save(); stopMusic(); } else { S.music = true; save(); ac(); startMusic(); } });
 $('#rSkip').addEventListener('click', () => { ac(); skipTrack(); });
+document.querySelector('#radio .rtxt').addEventListener('click', openPlaylist);
 if (document.addEventListener){
   const kick = () => { if (S.music && !M.on){ ac(); startMusic(); } };
   document.addEventListener('pointerdown', kick, true);
@@ -1666,6 +1714,78 @@ function bigfoot(c, x, feet, h, face, step, look, alpha=1){
   c.restore();
 }
 
+/* ================= the warden, hiding ================= */
+function bushMass(c, cx, cy, r, back, seedv){
+  const dark = back ? '#1d3a20' : '#2a5228', mid = back ? '#2f5a2c' : '#3f7436', lite = back ? '#4a7a3c' : '#6aa04c';
+  const blobs = back ? [[0,0,1],[-0.75,0.25,0.72],[0.75,0.25,0.75],[-0.35,-0.45,0.68],[0.4,-0.4,0.66]] : [[0,0.2,0.85],[-0.8,0.35,0.6],[0.8,0.35,0.62],[-0.45,-0.1,0.55],[0.5,-0.05,0.55]];
+  for (const [dx,dy,k] of blobs){
+    const bx = cx + dx*r, by = cy + dy*r, br = r*k, g = c.createRadialGradient(bx - br*0.35, by - br*0.4, 1, bx, by, br);
+    g.addColorStop(0, lite); g.addColorStop(0.55, mid); g.addColorStop(1, dark);
+    c.fillStyle = g; c.beginPath(); c.arc(bx, by, br, 0, 7); c.fill();
+  }
+  for (let i = 0; i < (back ? 26 : 34); i++){
+    const a = srand(seedv + i*1.7)*Math.PI*2, d = r*(0.55 + srand(seedv*3 + i)*0.6), lx = cx + Math.cos(a)*d*1.15, ly = cy + Math.sin(a)*d*0.8 - (back ? 0 : 2);
+    if (!back && ly > cy + r*0.7) continue;
+    c.fillStyle = srand(i*5.5 + seedv) > 0.5 ? lite : mid;
+    c.beginPath(); c.ellipse(lx, ly, 3.2, 1.7, a + 0.6, 0, 7); c.fill();
+  }
+}
+function hidingWarden(c, x, gy, sc, look, t, kind){
+  const stump = kind && kind.includes('stump'), birder = kind && kind.includes('birdwatcher'), fakeStache = kind && kind.includes('mustache');
+  const cyc = t % 5.2, duck = cyc > 4.3 ? Math.min(1, (cyc - 4.3)/0.25)*Math.min(1, (5.2 - cyc)/0.3)*10 : 0;
+  const hy = -31 + Math.sin(t*1.4)*1.1 + duck;
+  c.save(); c.translate(x, gy); c.scale(sc, sc);
+  c.fillStyle = 'rgba(0,0,0,.28)'; c.beginPath(); c.ellipse(4, 2, 27, 6, 0, 0, 7); c.fill();
+  if (!stump) bushMass(c, 0, -15, 21, true, 11);
+  /* shoulders: khaki uniform with badge */
+  let g = c.createLinearGradient(-16, 0, 16, 0); g.addColorStop(0, '#5a5532'); g.addColorStop(0.5, '#827b4c'); g.addColorStop(1, '#4e4a2b');
+  c.fillStyle = g; c.beginPath(); c.moveTo(-16, hy + 28); c.quadraticCurveTo(-16, hy + 12, -6, hy + 10); c.lineTo(6, hy + 10); c.quadraticCurveTo(16, hy + 12, 16, hy + 28); c.closePath(); c.fill();
+  c.fillStyle = '#3e3a22'; c.beginPath(); c.moveTo(-4, hy + 10); c.lineTo(0, hy + 16); c.lineTo(4, hy + 10); c.closePath(); c.fill();
+  c.fillStyle = '#e8c247'; c.beginPath(); for (let i = 0; i < 10; i++){ const a = -Math.PI/2 + i*Math.PI/5, rr = i % 2 ? 1.2 : 2.8; c.lineTo(-8 + Math.cos(a)*rr, hy + 17 + Math.sin(a)*rr); } c.closePath(); c.fill();
+  c.fillStyle = '#2f4a2a'; c.beginPath(); c.ellipse(12, hy + 15, 2.4, 3, 0.3, 0, 7); c.fill();
+  /* neck and head */
+  c.fillStyle = '#b97f55'; c.fillRect(-3, hy + 5, 6, 6);
+  g = c.createRadialGradient(-2.5, hy - 3, 1, 0, hy, 10); g.addColorStop(0, '#f0c39a'); g.addColorStop(1, '#c58b5f');
+  c.fillStyle = '#c58b5f'; c.beginPath(); c.ellipse(-8, hy + 0.5, 1.8, 2.6, 0, 0, 7); c.ellipse(8, hy + 0.5, 1.8, 2.6, 0, 0, 7); c.fill();
+  c.fillStyle = g; c.beginPath(); c.ellipse(0, hy, 8, 9.5, 0, 0, 7); c.fill();
+  if (birder && duck < 4){
+    c.fillStyle = '#1e1e1e'; c.fillRect(-7.5, hy - 3.5, 6.5, 4.6); c.fillRect(1, hy - 3.5, 6.5, 4.6); c.fillRect(-1.2, hy - 2.6, 2.4, 2.4);
+    c.fillStyle = '#5a7f9a'; c.beginPath(); c.arc(-4.2, hy - 1.2, 1.6, 0, 7); c.arc(4.2, hy - 1.2, 1.6, 0, 7); c.fill();
+    c.fillStyle = '#c58b5f'; c.beginPath(); c.arc(-9, hy + 2, 2.4, 0, 7); c.arc(9, hy + 2, 2.4, 0, 7); c.fill();
+  } else {
+    c.fillStyle = '#fff'; c.beginPath(); c.ellipse(-3.2, hy - 1.2, 2.3, 1.7, 0, 0, 7); c.ellipse(3.2, hy - 1.2, 2.3, 1.7, 0, 0, 7); c.fill();
+    c.fillStyle = '#1a1410'; c.beginPath(); c.arc(-3.2 + look*1.1, hy - 1.1, 1.05, 0, 7); c.arc(3.2 + look*1.1, hy - 1.1, 1.05, 0, 7); c.fill();
+    c.strokeStyle = '#4a2e18'; c.lineWidth = 1.1; c.beginPath(); c.moveTo(-5.6, hy - 4.6); c.lineTo(-1.3, hy - 3.4); c.moveTo(5.6, hy - 4.6); c.lineTo(1.3, hy - 3.4); c.stroke();
+  }
+  c.strokeStyle = 'rgba(120,70,40,.6)'; c.lineWidth = 0.9; c.beginPath(); c.moveTo(0, hy - 0.5); c.lineTo(-0.8, hy + 2.4); c.lineTo(0.6, hy + 2.6); c.stroke();
+  c.save(); c.translate(0, hy + 4.2); c.rotate(fakeStache ? 0.14 : 0);
+  c.fillStyle = fakeStache ? '#2b1a0c' : '#5a3a20'; c.beginPath();
+  const mw = fakeStache ? 6.2 : 4.2, mh = fakeStache ? 2.6 : 1.4;
+  c.moveTo(0, -mh*0.4); c.quadraticCurveTo(-mw*0.6, -mh, -mw, mh*0.5); c.quadraticCurveTo(-mw*0.5, mh*0.2, 0, mh*0.4); c.quadraticCurveTo(mw*0.5, mh*0.2, mw, mh*0.5); c.quadraticCurveTo(mw*0.6, -mh, 0, -mh*0.4); c.fill();
+  c.restore();
+  /* campaign hat with a twig stuck in it */
+  c.fillStyle = '#7d5f32'; c.beginPath(); c.ellipse(0, hy - 6.6, 15, 3.4, 0, 0, 7); c.fill();
+  c.fillStyle = '#a8834a'; c.beginPath(); c.ellipse(0, hy - 7.4, 15, 3, 0, 0, 7); c.fill();
+  g = c.createLinearGradient(-7, 0, 7, 0); g.addColorStop(0, '#8d6c3a'); g.addColorStop(0.5, '#b8945a'); g.addColorStop(1, '#7c5e30');
+  c.fillStyle = g; c.beginPath(); c.moveTo(-7, hy - 8); c.lineTo(-6.2, hy - 15); c.quadraticCurveTo(-3, hy - 18.5, 0, hy - 15.2); c.quadraticCurveTo(3, hy - 18.5, 6.2, hy - 15); c.lineTo(7, hy - 8); c.closePath(); c.fill();
+  c.fillStyle = '#3b2a16'; c.fillRect(-7, hy - 10.2, 14, 2.2);
+  c.strokeStyle = '#4a3220'; c.lineWidth = 1; c.beginPath(); c.moveTo(5, hy - 10); c.lineTo(9, hy - 19); c.stroke();
+  c.fillStyle = '#5f9a44'; c.beginPath(); c.ellipse(9.5, hy - 19.5, 2.6, 1.3, -0.8, 0, 7); c.ellipse(7.8, hy - 16.5, 2.2, 1.1, 0.5, 0, 7); c.fill();
+  /* cover in front */
+  if (stump){
+    g = c.createLinearGradient(-18, 0, 18, 0); g.addColorStop(0, '#4a3018'); g.addColorStop(0.45, '#8a6238'); g.addColorStop(1, '#3d2814');
+    c.fillStyle = g; c.beginPath(); c.moveTo(-18, 2); c.lineTo(-17, -19); c.lineTo(17, -19); c.lineTo(18, 2); c.closePath(); c.fill();
+    c.strokeStyle = 'rgba(40,24,10,.6)'; c.lineWidth = 1; for (const bx of [-11, -4, 4, 11]){ c.beginPath(); c.moveTo(bx, -18); c.lineTo(bx + 1, 1); c.stroke(); }
+    c.fillStyle = '#c49a68'; c.beginPath(); c.ellipse(0, -19, 17, 4, 0, 0, 7); c.fill();
+    c.strokeStyle = 'rgba(110,70,35,.7)'; for (const rr of [4, 8, 12]){ c.beginPath(); c.ellipse(0, -19, rr, rr*0.24, 0, 0, 7); c.stroke(); }
+    c.fillStyle = '#d9a274'; c.beginPath(); c.arc(-11, -21, 2.6, 0, 7); c.arc(11, -21, 2.6, 0, 7); c.fill();
+  } else {
+    if (!birder){ c.fillStyle = '#d9a274'; c.beginPath(); c.arc(-14, hy + 21, 2.6, 0, 7); c.arc(14, hy + 21, 2.6, 0, 7); c.fill(); }
+    bushMass(c, 0, -7, 19, false, 23);
+  }
+  c.restore();
+}
+
 /* ================= cinematic fx ================= */
 let FX = null;
 function fxSprites(){
@@ -2062,15 +2182,7 @@ function draw(){
       bigfoot(c, o.x, y, 46, -o.side, o.step, look, a);
     }
     else if (o.type === 'warden'){
-      const sn = Math.sin(G.t*9)*1.5, look = G.px > o.x ? 1 : -1;
-      if (o.disg.includes('stump')){
-        c.fillStyle = 'rgba(0,0,0,.3)'; c.beginPath(); c.ellipse(o.x + 5, y + 4, 14, 11, 0, 0, 7); c.fill();
-        const g = c.createRadialGradient(o.x, y, 1, o.x, y, 14); g.addColorStop(0, '#b58a5a'); g.addColorStop(0.7, '#8a6238'); g.addColorStop(1, '#3d2814');
-        c.fillStyle = g; c.beginPath(); c.ellipse(o.x, y, 14, 11, 0, 0, 7); c.fill();
-        c.strokeStyle = 'rgba(70,45,20,.6)'; c.lineWidth = 1; for (const r2 of [3,6,9]){ c.beginPath(); c.ellipse(o.x, y, r2, r2*0.8, 0, 0, 7); c.stroke(); }
-      } else leafy(c, o.x + sn, y, 16, false, 4.2);
-      if ((G.t % 2.2) < 1.6){ c.fillStyle = '#fff'; c.beginPath(); c.arc(o.x - 4 + sn, y - 2, 2.6, 0, 7); c.arc(o.x + 4 + sn, y - 2, 2.6, 0, 7); c.fill(); c.fillStyle = '#111'; c.beginPath(); c.arc(o.x - 4 + sn + look, y - 2, 1.2, 0, 7); c.arc(o.x + 4 + sn + look, y - 2, 1.2, 0, 7); c.fill(); }
-      c.fillStyle = '#6b5a2e'; c.beginPath(); c.ellipse(o.x + sn, y - 13, 11, 3, 0, 0, 7); c.fill(); c.fillRect(o.x - 5 + sn, y - 21, 10, 8);
+      hidingWarden(c, o.x, y + 12, 0.85, G.px > o.x ? 1 : -1, G.t, o.disg);
     }
   }
   /* player wake spray */
@@ -2477,10 +2589,7 @@ function drawPerson(c, x, feet, u, face, step, o){
   c.restore();
 }
 function drawTownBush(c, x, ground, u){
-  leafyT(c, x, ground - 16*u, 22*u);
-  const sn = Math.sin(TS.t*7)*1;
-  if ((TS.t % 3) < 2.4){ c.fillStyle = '#fff'; c.beginPath(); c.arc(x - 5 + sn, ground - 22*u, 2.6, 0, 7); c.arc(x + 4 + sn, ground - 22*u, 2.6, 0, 7); c.fill(); c.fillStyle = '#111'; const lk = TS.x > x ? 1 : -1; c.beginPath(); c.arc(x - 5 + sn + lk, ground - 22*u, 1.2, 0, 7); c.arc(x + 4 + sn + lk, ground - 22*u, 1.2, 0, 7); c.fill(); }
-  c.fillStyle = '#6b5a2e'; c.beginPath(); c.ellipse(x + sn, ground - 36*u, 12, 3, 0, 0, 7); c.fill(); c.fillRect(x - 6 + sn, ground - 44*u, 12, 8*u);
+  hidingWarden(c, x, ground, u*1.15, TS.x > x ? 1 : -1, TS.t, 'shrub mustache');
 }
 function leafyT(c, x, y, r){
   [[0,0,1],[-0.6,0.15,0.75],[0.6,0.2,0.78],[0.15,-0.45,0.7]].forEach(([dx,dy,k]) => {

@@ -601,26 +601,26 @@ let MR = 1;
 const rr = () => { MR = (Math.imul(MR, 1664525) + 1013904223) >>> 0; return MR / 4294967296; };
 const rp = a => a[Math.floor(rr()*a.length)];
 const PLAYLIST = [
-  {title:'Jet Sled Voltage', artist:'Smolt Machine', style:'electronic', bpm:124, key:45, prog:0, seed:101},
-  {title:'Tailout Shuffle', artist:'Two-Rod Terry & the Plunkers', style:'country', bpm:110, key:43, prog:0, seed:202},
-  {title:'Chum Run Remix', artist:'Big Chum Beats', style:'hiphop', bpm:88, key:45, prog:0, seed:303},
-  {title:'Steelhead Swing', artist:'The Silt Creek Quartet', style:'jazz', bpm:148, key:41, prog:0, seed:404},
-  {title:'Glacial Milk', artist:'Silty Circuits', style:'electronic', bpm:118, key:47, prog:1, seed:505},
-  {title:'Gravel Bar Boogie', artist:'The Gravel Bar Boys', style:'country', bpm:114, key:45, prog:1, seed:606},
-  {title:'Adipose Clipped', artist:'MC Adipose', style:'hiphop', bpm:86, key:48, prog:1, seed:707},
-  {title:'Eddy Line Blues', artist:'Eddy Line Trio', style:'jazz', bpm:132, key:43, prog:1, seed:808},
-  {title:'Radioactive Drift', artist:'DJ Wobbler', style:'electronic', bpm:126, key:46, prog:2, seed:909},
-  {title:'Plunker\'s Hoedown', artist:'Hollerin\' Hank', style:'country', bpm:116, key:47, prog:2, seed:1010},
-  {title:'Boat Ramp Cypher', artist:'Lil Smolt', style:'hiphop', bpm:90, key:46, prog:2, seed:1111},
-  {title:'Hatchery Bop', artist:'Tailout Trio', style:'jazz', bpm:160, key:46, prog:0, seed:1212},
-  {title:'Tidewater Pulse', artist:'Smolt Machine', style:'electronic', bpm:121, key:48, prog:1, seed:1313},
-  {title:'Rainy Day Two-Step', artist:'Two-Rod Terry & the Plunkers', style:'country', bpm:104, key:48, prog:1, seed:1414},
-  {title:'Silt Creek Beat Tape', artist:'Big Chum Beats', style:'hiphop', bpm:84, key:50, prog:0, seed:1515},
-  {title:'Low Water Standard', artist:'The Silt Creek Quartet', style:'jazz', bpm:138, key:44, prog:1, seed:1616},
-  {title:'Night Bite Protocol', artist:'DJ Wobbler', style:'electronic', bpm:119, key:50, prog:2, seed:1717},
-  {title:'Corner Stop Ramble', artist:'The Gravel Bar Boys', style:'country', bpm:108, key:50, prog:0, seed:1818},
-  {title:'Fog Bank Flow', artist:'MC Adipose', style:'hiphop', bpm:92, key:45, prog:2, seed:1919},
-  {title:'Sasquatch Stomp', artist:'Eddy Line Trio', style:'jazz', bpm:154, key:48, prog:0, seed:2020},
+  {title:'Jet Sled Voltage', artist:'Smolt Machine', style:'electronic', bpm:126, key:45, scale:'minor', prog:[[0,'m'],[8,'M'],[3,'M'],[10,'M']], drum:'four', bass:'offbeat', comp:'stabs', lead:'supersaw', leadB:'pluck', tpl:0, seed:101},
+  {title:'Tailout Shuffle', artist:'Two-Rod Terry & the Plunkers', style:'country', bpm:112, key:43, scale:'major', swing:0.3, prog:[[0,'M'],[5,'M'],[0,'M'],[7,'M']], drum:'shuffle', bass:'rootfive', comp:'strum', lead:'pluck', leadB:'harmonica', tpl:1, seed:202},
+  {title:'Chum Run Remix', artist:'Big Chum Beats', style:'hiphop', bpm:90, key:45, scale:'minor', swing:0.28, prog:[[0,'m7'],[5,'m7'],[8,'maj7'],[7,'7']], drum:'boombap', bass:'sub', comp:'keys', lead:'vibes', leadB:'bell', tpl:3, seed:303, crackle:true},
+  {title:'Steelhead Swing', artist:'The Silt Creek Quartet', style:'jazz', bpm:168, key:41, scale:'major', swing8:true, prog:[[2,'m7'],[7,'7'],[0,'maj7'],[9,'7']], drum:'swing', bass:'walk', comp:'pianocomp', lead:'sax', leadB:'vibes', tpl:4, seed:404},
+  {title:'Glacial Milk', artist:'Silty Circuits', style:'electronic', bpm:96, key:47, scale:'minor', cb:2, prog:[[0,'m'],[5,'m'],[10,'M'],[3,'M']], drum:'halftime', bass:'sub', comp:'pad', lead:'bell', leadB:'flute', tpl:2, seed:505, gain:1.6},
+  {title:'Gravel Bar Boogie', artist:'The Gravel Bar Boys', style:'country', bpm:146, key:45, scale:'blues', prog:[[0,'7'],[0,'7'],[5,'7'],[0,'7'],[7,'7'],[5,'7'],[0,'7'],[7,'7']], drum:'train', bass:'boogie', comp:'stabs', lead:'piano', leadB:'harmonica', tpl:4, seed:606},
+  {title:'Adipose Clipped', artist:'MC Adipose', style:'hiphop', bpm:140, key:48, scale:'minor', cb:2, prog:[[0,'m'],[0,'m'],[8,'M'],[7,'M']], drum:'trap', bass:'sub808', comp:'pad', lead:'flute', leadB:'pluck', tpl:1, seed:707},
+  {title:'Eddy Line Blues', artist:'Eddy Line Trio', style:'jazz', bpm:116, key:43, scale:'blues', swing8:true, prog:[[0,'7'],[0,'7'],[0,'7'],[0,'7'],[5,'7'],[5,'7'],[0,'7'],[0,'7'],[7,'7'],[5,'7'],[0,'7'],[7,'7']], drum:'swing', bass:'walk', comp:'organ', lead:'brass', leadB:'sax', tpl:2, seed:808},
+  {title:'Radioactive Drift', artist:'DJ Wobbler', style:'electronic', bpm:134, key:46, scale:'minor', prog:[[0,'m'],[0,'m'],[8,'M'],[10,'M']], drum:'breaks', bass:'rolling', comp:'arp', lead:'square', leadB:'saw', tpl:4, seed:909},
+  {title:'Plunker\'s Hoedown', artist:'Hollerin\' Hank', style:'country', bpm:152, key:47, scale:'major', prog:[[0,'M'],[0,'M'],[5,'M'],[7,'M']], drum:'bluegrass', bass:'rootfive', comp:'strum', lead:'fiddle', leadB:'pluck', tpl:4, seed:1010},
+  {title:'Boat Ramp Cypher', artist:'Lil Smolt', style:'hiphop', bpm:94, key:46, scale:'minor', swing:0.2, prog:[[0,'m7'],[3,'maj7'],[10,'7'],[5,'m7']], drum:'gfunk', bass:'syncopated', comp:'keys', lead:'whistle', leadB:'brass', tpl:0, seed:1111},
+  {title:'Hatchery Bop', artist:'Tailout Trio', style:'jazz', bpm:208, key:46, scale:'major', swing8:true, prog:[[0,'maj7'],[9,'7'],[2,'m7'],[7,'7']], drum:'bebop', bass:'walk', comp:'pianocomp', lead:'sax', leadB:'piano', tpl:4, seed:1212},
+  {title:'Tidewater Pulse', artist:'Smolt Machine', style:'electronic', bpm:128, key:48, scale:'minor', prog:[[0,'m'],[10,'M'],[8,'M'],[7,'m']], drum:'twostep', bass:'syncopated', comp:'organ', lead:'whistle', leadB:'vibes', tpl:3, seed:1313},
+  {title:'Rainy Day Two-Step', artist:'Two-Rod Terry & the Plunkers', style:'country', bpm:100, key:48, scale:'major', meter:3, prog:[[0,'M'],[7,'M'],[9,'m'],[5,'M']], drum:'waltz', bass:'waltz', comp:'waltzchick', lead:'steel', leadB:'whistle', tpl:0, seed:1414, gain:1.9},
+  {title:'Silt Creek Beat Tape', artist:'Big Chum Beats', style:'hiphop', bpm:78, key:50, scale:'major', swing:0.32, prog:[[0,'maj7'],[9,'m7'],[2,'m7'],[7,'7']], drum:'lofi', bass:'sub', comp:'pianocomp', lead:'sax', leadB:'vibes', tpl:2, seed:1515, crackle:true},
+  {title:'Low Water Standard', artist:'The Silt Creek Quartet', style:'jazz', bpm:120, key:44, scale:'major', prog:[[2,'m7'],[7,'7'],[0,'maj7'],[0,'maj7']], drum:'bossa', bass:'bossa', comp:'bossaguitar', lead:'flute', leadB:'vibes', tpl:1, seed:1616},
+  {title:'Night Bite Protocol', artist:'DJ Wobbler', style:'electronic', bpm:110, key:50, scale:'phrygian', prog:[[0,'m'],[1,'M'],[0,'m'],[10,'M']], drum:'synth', bass:'pulse8', comp:'pad', lead:'brass', leadB:'square', tpl:2, seed:1717},
+  {title:'Corner Stop Ramble', artist:'The Gravel Bar Boys', style:'country', bpm:96, key:50, scale:'major', prog:[[0,'M'],[9,'m'],[5,'M'],[7,'M']], drum:'ballad', bass:'pulse8', comp:'arp', lead:'harmonica', leadB:'steel', tpl:3, seed:1818},
+  {title:'Fog Bank Flow', artist:'MC Adipose', style:'hiphop', bpm:142, key:45, scale:'minor', cb:2, prog:[[0,'m'],[8,'M'],[5,'m'],[7,'M']], drum:'drill', bass:'sub808', comp:'stabs', lead:'piano', leadB:'bell', tpl:3, seed:1919},
+  {title:'Sasquatch Stomp', artist:'Eddy Line Trio', style:'jazz', bpm:156, key:48, scale:'minor', meter:3, swing8:true, prog:[[0,'m7'],[5,'m7'],[10,'7'],[3,'maj7']], drum:'jazzwaltz', bass:'waltz', comp:'pianocomp', lead:'vibes', leadB:'sax', tpl:1, seed:2020},
 ];
 let PL_ORDER = null;
 function buildOrder(){
@@ -634,74 +634,158 @@ function buildOrder(){
   }
   return out;
 }
-function melNote(scale, base){ M.mel = clamp(M.mel + rp([-2,-1,-1,1,1,2]), -3, 8); const L = scale.length, deg = ((M.mel % L) + L) % L; return base + scale[deg] + 12*Math.floor(M.mel/L); }
-
+const SCALES = {major:[0,2,4,5,7,9,11], minor:[0,2,3,5,7,8,10], blues:[0,3,5,6,7,10], phrygian:[0,1,3,5,7,8,10]};
+const DRUMS = {
+  four:     {k:'x...x...x...x...', c:'....x.......x...', h:'..x...x...x...x.', sh:'.o.o.o.o.o.o.o.o'},
+  halftime: {k:'x.........x.....', s:'........x.......', h:'x.o.x.o.x.o.x.o.'},
+  breaks:   {k:'x.....x...x.....', s:'....x.......x..o', h:'x.x.x.x.x.x.x.x.', oh:'..............x.'},
+  twostep:  {k:'x......x..x.....', s:'....x.......x...', h:'..x.o.x...x.o.xx'},
+  synth:    {k:'x...x...x...x...', s:'....x.......x...', h:'xoxoxoxoxoxoxoxo'},
+  shuffle:  {k:'x.......x.......', s:'....x.......x...', h:'x.x.x.x.x.x.x.x.'},
+  train:    {k:'x.......x.......', s:'o.o.x.o.o.o.x.o.', sh:'xoxoxoxoxoxoxoxo'},
+  bluegrass:{k:'x.......x.......', b:'..x...x...x...x.'},
+  waltz:    {k:'x...........', s:'....o...o...', h:'x.x.x.x.x.x.'},
+  ballad:   {k:'x.......x.......', b:'x...x...x...x...', s:'....o.......o...'},
+  boombap:  {k:'x.........x..x..', s:'....x.......x...', h:'x.x.x.x.x.x.x.x.'},
+  trap:     {k:'x......x..x.....', s:'........x.......', h:'xxxxxxxxxxxxxxxx'},
+  gfunk:    {k:'x.....x.x.......', s:'....x.......x...', c:'....x.......x...', h:'x.x.x.x.x.x.x.x.'},
+  lofi:     {k:'x......x.x......', s:'....x.......x...', h:'..x...x...x...x.'},
+  drill:    {k:'x.....x...x...o.', s:'......x.......x.', h:'x.x.xx.xx.x.x.xx'},
+  swing:    {r:'x...x.x.x...x.x.', h:'....x.......x...', k:'o...o...o...o...'},
+  bebop:    {r:'x...x.x.x...x.x.', h:'....x.......x...', s:'o.....o...o.....'},
+  bossa:    {k:'x..x....x..x....', m:'x..x..x...x..x..', sh:'xoxoxoxoxoxoxoxo'},
+  jazzwaltz:{r:'x...x.x.x.x.', h:'....x...x...', k:'o...........'},
+};
+const HOOK_TPL4 = [
+  [[0,2],[2,2],[4,4],[8,2],[10,2],[12,4],[16,2],[18,2],[20,2],[22,2],[24,8]],
+  [[0,3],[3,3],[6,2],[8,6],[16,3],[19,3],[22,2],[24,6]],
+  [[0,4],[4,4],[8,8],[16,4],[20,4],[24,8]],
+  [[2,2],[4,2],[6,2],[8,4],[12,4],[18,2],[20,2],[22,2],[24,4],[28,4]],
+  [[0,1],[1,1],[2,2],[4,2],[6,2],[8,4],[14,2],[16,1],[17,1],[18,2],[20,2],[22,2],[24,8]],
+];
+const HOOK_TPL3 = [ [[0,4],[4,2],[6,2],[8,4],[12,6],[18,6]], [[0,6],[6,2],[8,4],[12,4],[16,8]], [[0,2],[2,2],[4,4],[8,4],[12,2],[14,2],[16,8]] ];
+function genMotif(seedv, spb, tplIdx){
+  MR = seedv;
+  const tpls = spb === 12 ? HOOK_TPL3 : HOOK_TPL4, tpl = tpls[tplIdx % tpls.length];
+  let d = rp([0,2,4]); const notes = [];
+  tpl.forEach(([pos, len], i) => {
+    if (i > 0) d = clamp(d + rp([-2,-1,-1,1,1,2,3,-3,0]), -1, 9);
+    if (i === tpl.length - 1) d = Math.abs(d - 0) < Math.abs(d - 4) ? 0 : 4;
+    notes.push({pos, len, deg:d});
+  });
+  const alt = notes.map((n, i) => i < notes.length - 3 ? n : {...n, deg: clamp(n.deg + rp([-2,-1,1,2]), -1, 9)});
+  alt[alt.length - 1] = {...alt[alt.length - 1], deg: 0};
+  return [notes, alt];
+}
+function buildForm(song){
+  const spb = song.meter === 3 ? 3 : 4, barSec = spb*60/song.bpm, form = [];
+  const push = (name, n) => { for (let i = 0; i < n; i++) form.push([name, i]); };
+  push('intro', 4);
+  let cycles = 0;
+  while ((form.length + 12) * barSec < 175 || cycles < 2){ push('verse', 8); push('chorus', 8); cycles++; if (cycles === 2) push('break', 4); if (cycles > 8) break; }
+  push('chorus', 8); push('outro', 4);
+  return form;
+}
+function deg2m(deg, base, sc){ const L = sc.length; return base + sc[((deg % L) + L) % L] + 12*Math.floor(deg/L); }
+/* extra instruments */
+function mRim(t, v=0.1){ vo('square', 1700, t, 0.03, env(t, 0.001, 0.03, v)); nz(t, 0.02, 'bandpass', 2500, 2, v*0.6); }
+function mBrush(t, v=0.06){ nz(t, 0.18, 'bandpass', 3500, 0.8, v); }
+function mSub808(t, m, dur, slide, v=0.6){ const g = env(t, 0.004, dur, v), o = AC.createOscillator(); o.type = 'sine'; o.frequency.setValueAtTime(mtof(m + (slide||0)), t); if (slide) o.frequency.exponentialRampToValueAtTime(mtof(m), t + 0.12); o.connect(g); o.start(t); o.stop(t + dur + 0.05); vo('triangle', mtof(m)*2, t, 0.06, env(t, 0.001, 0.05, v*0.25)); }
+function mOrgan(t, ms, dur, v=0.03){ ms.forEach(m => { const g = hold(t, 0.02, dur, 0.12, v); [1,2,3,4].forEach((h, i) => vo('sine', mtof(m)*h, t, dur + 0.15, g, i ? 3 : 0)); }); }
+function mLeadT(t, m, dur, tim, v=0.05){
+  if (tim === 'supersaw'){ const g = hold(t, 0.01, dur, 0.12, v*0.7), f = filt('lowpass', 3200, 0.9, g); [-14, 0, 14].forEach(d => vo('sawtooth', mtof(m), t, dur + 0.15, f, d)); return; }
+  if (tim === 'pluck') return mPluck(t, m, Math.max(0.2, dur), v*1.2);
+  if (tim === 'piano'){ const g = env(t, 0.003, Math.max(0.35, dur*1.2), v*1.2); vo('triangle', mtof(m), t, dur + 0.4, g); vo('sine', mtof(m)*2, t, 0.3, env(t, 0.002, 0.25, v*0.4)); return; }
+  if (tim === 'bell'){ const g = env(t, 0.002, Math.max(0.6, dur*1.5), v*1.1); vo('sine', mtof(m), t, dur + 0.8, g); vo('sine', mtof(m)*2.76, t, 0.5, env(t, 0.001, 0.4, v*0.35)); return; }
+  if (tim === 'vibes'){ const g = env(t, 0.003, Math.max(0.7, dur*1.6), v*1.1), o = vo('sine', mtof(m), t, dur + 0.9, g); vo('sine', mtof(m)*4, t, 0.2, env(t, 0.001, 0.15, v*0.2)); const l = AC.createOscillator(), lg = AC.createGain(); l.frequency.value = 6; lg.gain.value = 0.25; l.connect(lg).connect(g.gain); l.start(t); l.stop(t + dur + 0.9); return; }
+  if (tim === 'flute'){ mLead(t, m, dur, v*0.9, 'sine', 3000, 9); nz(t, Math.min(0.12, dur), 'bandpass', mtof(m)*2, 3, v*0.25); return; }
+  if (tim === 'whistle'){ const g = hold(t, 0.03, dur, 0.1, v*0.9), o = AC.createOscillator(); o.type = 'sine'; o.frequency.setValueAtTime(mtof(M.lastLead || m), t); o.frequency.exponentialRampToValueAtTime(mtof(m), t + 0.08); o.connect(g); o.start(t); o.stop(t + dur + 0.15); const l = AC.createOscillator(), lg = AC.createGain(); l.frequency.value = 5.5; lg.gain.value = 18; l.connect(lg).connect(o.detune); l.start(t); l.stop(t + dur + 0.15); M.lastLead = m; return; }
+  if (tim === 'sax') return mLead(t, m, dur, v, 'sawtooth', 1500, 14);
+  if (tim === 'brass'){ const g = hold(t, 0.04, dur, 0.08, v), f = AC.createBiquadFilter(); f.type = 'lowpass'; f.frequency.setValueAtTime(500, t); f.frequency.exponentialRampToValueAtTime(2600, t + 0.06); f.frequency.exponentialRampToValueAtTime(1300, t + Math.max(0.1, dur)); f.connect(g); vo('sawtooth', mtof(m), t, dur + 0.1, f); vo('sawtooth', mtof(m), t, dur + 0.1, f, 8); return; }
+  if (tim === 'harmonica'){ const g = hold(t, 0.02, dur, 0.06, v*0.9), f = filt('bandpass', 1300, 1.4, g), o = vo('square', mtof(m), t, dur + 0.1, f); const l = AC.createOscillator(), lg = AC.createGain(); l.frequency.value = 6; lg.gain.value = 16; l.connect(lg).connect(o.detune); l.start(t); l.stop(t + dur + 0.1); return; }
+  if (tim === 'fiddle') return mLead(t, m, dur, v*0.85, 'sawtooth', 3000, 26);
+  if (tim === 'steel'){ mSteel(t, M.lastLead || m - 2, m, dur, v*1.1); M.lastLead = m; return; }
+  return mLead(t, m, dur, v, tim === 'saw' ? 'sawtooth' : 'square', 2400, 0);
+}
 function newTrack(idx){
   if (!PL_ORDER) PL_ORDER = buildOrder();
   if (idx == null){ M.pos = ((M.pos == null ? -1 : M.pos) + 1) % PL_ORDER.length; idx = PL_ORDER[M.pos]; }
   else M.pos = PL_ORDER.indexOf(idx);
-  const song = PLAYLIST[idx], d = MUS[song.style];
-  M.song = idx; M.style = song.style; M.bpm = song.bpm; M.key = song.key; M.prog = d.progs[song.prog % d.progs.length];
-  M.bars = Math.max(48, Math.round(3.5*M.bpm/4/16)*16); M.mel = 2; M.lastF = 0; MR = song.seed;
+  const song = PLAYLIST[idx];
+  M.song = idx; M.style = song.style; M.bpm = song.bpm; M.key = song.key; M.spb = song.meter === 3 ? 12 : 16;
+  M.form = buildForm(song); M.bars = M.form.length; M.lastLead = 0;
+  M.hook = genMotif(song.seed, M.spb, song.tpl); M.answer = genMotif(song.seed*7 + 3, M.spb, song.tpl + 2);
+  MR = song.seed*13 + 1;
   M.name = song.title; M.artist = song.artist;
-  if (M.out && AC) M.out.gain.setTargetAtTime(MIXV[M.style], AC.currentTime, 0.1);
+  if (M.out && AC) M.out.gain.setTargetAtTime(MIXV[M.style]*(PLAYLIST[M.song].gain || 1), AC.currentTime, 0.1);
   updateRadio();
 }
 function playStep(t){
-  const s16 = 60/M.bpm/4, bar = M.bar % 16, step = M.step, ch = M.prog[bar % M.prog.length], root = M.key + ch[0], tones = QUAL[ch[1]], barDur = s16*16;
-  const st = M.style;
-  if (st === 'electronic'){
-    const drums = bar >= 2 && bar < 14 || bar >= 15;
-    if (drums && step % 4 === 0) mKick(t, 0.85);
-    if (drums && (step === 4 || step === 12)) mClap(t, 0.3);
-    if (step % 4 === 2) mHat(t, 0.11, true); else if (step % 2 === 1) mHat(t, 0.045);
-    if (drums && step % 4 === 2) mBass(t, bassReg(root), s16*1.6, 'sawtooth', 500 + (bar % 4)*120, 0.45);
-    const ap = [0,1,2,1,0,2,1,2, 0,1,2,3,2,1,0,2][step], ti = tones[ap % tones.length] + (ap >= tones.length ? 12 : 0);
-    mLead(t, root + 12 + ti + (step >= 8 ? 12 : 0), s16*0.8, 0.035, 'square', 700 + (bar % 8)*260);
-    if (step === 0) mPad(t, tones.map(i => root + 12 + i), barDur*0.95, 0.028);
-    if (bar >= 8 && bar < 14 && [0,3,6,10,12].includes(step) && rr() < 0.6) mLead(t, melNote(PENT_MIN, root + 24), s16*2, 0.05, 'sawtooth', 2600, 8);
-    if (bar === 15 && step >= 8 && step % 2 === 0) mSnare(t, 0.08 + step*0.012, 1500);
+  const song = PLAYLIST[M.song], SPB = M.spb, s16 = 60/M.bpm/4, step = M.step, bar = M.bar;
+  const [sec, bi] = M.form[bar] || ['outro', 0], nextSec = (M.form[bar + 1] || ['end'])[0];
+  const ci = Math.floor(bar / (song.cb || 1)) % song.prog.length, ch = song.prog[ci], root = M.key + ch[0], tones = QUAL[ch[1]], sc = SCALES[song.scale] || SCALES.major;
+  let tt = t;
+  if (song.swing8){ if (step % 4 === 2) tt = t + s16*0.66; else if (step % 2) return; }
+  else if (song.swing && step % 2 === 1) tt = t + s16*song.swing;
+  const lvl = {intro:0.55, verse:0.8, chorus:1, break:0.5, outro:0.6}[sec];
+  /* drums */
+  const D = DRUMS[song.drum], drumsOn = sec !== 'break' && !(sec === 'intro' && bi < 2) && !(sec === 'outro' && bi >= 2);
+  if (drumsOn){
+    const v = k => { const ch2 = D[k] && D[k][step]; return ch2 === 'x' ? 1 : ch2 === 'o' ? 0.5 : 0; };
+    let x;
+    if ((x = v('k'))) mKick(tt, 0.9*x*lvl);
+    if ((x = v('s'))) mSnare(tt, 0.4*x*lvl, song.style === 'hiphop' ? 650 : 1200);
+    if ((x = v('c'))) mClap(tt, 0.3*x*lvl);
+    if ((x = v('h'))) mHat(tt, 0.075*x*lvl);
+    if ((x = v('oh'))) mHat(tt, 0.1*x*lvl, true);
+    if ((x = v('r'))) mRide(tt, 0.07*x*lvl);
+    if ((x = v('m'))) mRim(tt, 0.11*x*lvl);
+    if ((x = v('b'))) mBrush(tt, 0.06*x*lvl);
+    if ((x = v('sh'))) mShaker(tt, 0.06*x*lvl);
+    if (song.drum === 'trap' && sec === 'chorus' && bar % 2 && step >= 12){ mHat(tt + s16/3, 0.05); mHat(tt + 2*s16/3, 0.05); }
+    if (song.drum === 'bebop' && rr() < 0.06) mKick(tt, 0.35);
+    if (nextSec === 'chorus' && bi === 7 && step >= SPB/2 && step % 2 === 0 && !song.swing8) mSnare(tt, 0.1 + 0.25*(step/SPB), 1500);
   }
-  if (st === 'country'){
-    if (step === 0 || step === 8) mKick(t, 0.6);
-    if (step === 4 || step === 12) mSnare(t, 0.22, 1400);
-    if (step % 2 === 0) mShaker(t, step % 4 === 2 ? 0.07 : 0.04);
-    if (step === 0) mBass(t, bassReg(root), s16*3, 'triangle', 900, 0.6);
-    if (step === 8) mBass(t, bassReg(root + 7), s16*3, 'triangle', 900, 0.6);
-    if (step === 14 && bar % 2) mBass(t, bassReg(root + 4), s16*1.5, 'triangle', 900, 0.45);
-    if (step === 4 || step === 12 || (step === 14 && rr() < 0.5)){
-      const vs = [root + 12, ...tones.map(i => root + 12 + i), root + 24], up = step === 14;
-      (up ? vs.slice().reverse() : vs).forEach((m, k) => mPluck(t + k*0.011, m, 0.28, up ? 0.04 : 0.055));
+  if (song.crackle && rr() < 0.3) mCrackle(t + Math.random()*s16);
+  /* bass */
+  const bassOn = !(sec === 'intro' && bi < 2);
+  if (bassOn){
+    const br = bassReg(root), B = song.bass;
+    if (B === 'offbeat' && step % 4 === 2) mBass(tt, br, s16*1.6, 'sawtooth', 520, 0.45*lvl);
+    if (B === 'rolling') mBass(tt, br + (step % 4 === 2 ? 12 : 0), s16*0.9, 'sawtooth', 420 + lvl*200, 0.38*lvl);
+    if (B === 'pulse8' && step % 2 === 0) mBass(tt, br + (step % 8 === 6 ? 12 : 0), s16*1.7, song.style === 'country' ? 'triangle' : 'square', 650, 0.4*lvl);
+    if ((B === 'sub' || B === 'sub808') && DRUMS[song.drum].k && DRUMS[song.drum].k[step] === 'x'){ if (B === 'sub') mSub(tt, br, s16*(step === 0 ? 6 : 4), 0.5*lvl); else mSub808(tt, br, s16*(step === 0 ? 7 : 4), rr() < 0.3 ? 5 : 0, 0.6*lvl); }
+    if (B === 'syncopated' && 'x..x..x...x.x...'[step] === 'x') mBass(tt, br + [0, 0, 7, 12, 10][Math.floor(rr()*5)], s16*1.4, 'sawtooth', 700, 0.42*lvl);
+    if (B === 'rootfive'){ if (step === 0) mBass(tt, br, s16*3, 'triangle', 900, 0.6*lvl); if (step === 8 && SPB === 16) mBass(tt, bassReg(root + 7), s16*3, 'triangle', 900, 0.6*lvl); }
+    if (B === 'boogie' && step % 2 === 0) mBass(tt, br + [0,4,7,9,10,9,7,4][step/2], s16*1.7, 'triangle', 900, 0.5*lvl);
+    if (B === 'walk' && step % 4 === 0){
+      const nx = song.prog[(Math.floor((bar + 1)/(song.cb || 1))) % song.prog.length], nr = M.key + nx[0], last = step === SPB - 4;
+      const m = step === 0 ? root : last ? nr + rp([-1, 1]) : root + rp([tones[1], tones[2], tones[3] || 12]);
+      mUpright(tt, bassReg(m), 0.62*lvl);
     }
-    if ((bar % 8) >= 4 && [0,6,8,12].includes(step) && rr() < 0.65){ const m = melNote(PENT_MAJ, root + 24); mSteel(t, M.lastF || m - 2, m, s16*3, 0.06); M.lastF = m; }
-    if (bar >= 8 && bar < 12 && step % 2 === 0 && rr() < 0.7) mLead(t, melNote(PENT_MAJ, root + 24), s16*1.8, 0.04, 'sawtooth', 2200, 18);
+    if (B === 'bossa'){ if (step === 0 || step === 8) mUpright(tt, br, 0.55); if (step === 6 || step === 14) mUpright(tt, bassReg(root + 7), 0.45); }
+    if (B === 'waltz' && step === 0) mUpright(tt, br, 0.6*lvl);
   }
-  if (st === 'hiphop'){
-    const sw = step % 2 === 1 ? s16*0.28 : 0, tt = t + sw;
-    if (step === 0 || step === 10 || (step === 7 && bar % 2)) { mKick(tt, 0.95); mSub(tt, bassReg(root), s16*(step === 0 ? 6 : 4), 0.5); }
-    if (step === 4 || step === 12) mSnare(tt, 0.42, 650);
-    if (step % 2 === 0) mHat(tt, step % 4 === 0 ? 0.08 : 0.05);
-    if ((step === 14 || step === 15) && bar % 4 === 3) mHat(tt, 0.04);
-    if (step === 0) mKeys(tt, tones.map(i => root + 12 + i), barDur*0.85, 0.045);
-    if (step === 14 && bar % 2 === 0) mKeys(tt, tones.slice(1).map(i => root + 12 + i), s16*1.5, 0.03);
-    if (bar >= 4 && [2,6,11].includes(step) && rr() < 0.5) mKeys(tt, [melNote(PENT_MIN, root + 24)], s16*2, 0.04);
-    if (Math.random() < 0.3) mCrackle(t + Math.random()*s16); /* crackle stays random */
-  }
-  if (st === 'jazz'){
-    if (step % 2) return;
-    const tt = t + (step % 4 === 2 ? s16*0.66 : 0);
-    if ([0,4,6,8,12,14].includes(step)) mRide(tt, step === 4 || step === 12 ? 0.08 : 0.055);
-    if (step === 4 || step === 12) mHat(tt, 0.05);
-    if (step % 4 === 0) mKick(tt, 0.1);
-    if (step === 10 && rr() < 0.25) mSnare(tt, 0.05, 1800);
-    if (step % 4 === 0){
-      const nx = M.prog[(bar + 1) % M.prog.length], nr = M.key + nx[0];
-      const m = step === 0 ? root : step === 4 ? root + rp([tones[1], tones[2]]) : step === 8 ? root + rp([tones[2], tones[3] || 12]) : nr + rp([-1, 1]);
-      mUpright(tt, bassReg(m), 0.62);
-    }
-    if ((step === 0 && rr() < 0.5) || (step === 6 && rr() < 0.7) || (step === 14 && rr() < 0.3)) mKeys(tt, [root + 12 + tones[1], root + 12 + (tones[3] || 12), root + 26], s16*1.6, 0.04);
-    if ((bar % 4) !== 3 && bar >= 2 && rr() < 0.55) mLead(tt, melNote(BOP, M.key + 19), s16*1.8, 0.045, 'sawtooth', 1700, 12);
-  }
+  /* chords */
+  const vs = tones.map(i => root + 12 + i), C = song.comp;
+  if (C === 'pad' && step === 0) mPad(tt, vs, s16*SPB*0.95, 0.028);
+  if (C === 'stabs' && sec !== 'intro' && [2,6,10,14].includes(step)) mKeys(tt, vs, s16*0.9, 0.032*lvl);
+  if (C === 'stabs' && sec === 'intro' && step === 0) mPad(tt, vs, s16*SPB*0.9, 0.022);
+  if (C === 'arp'){ const ap = [0,1,2,1,0,2,1,2,0,1,2,3,2,1,0,2][step % 16], ti = tones[ap % tones.length] + (ap >= tones.length ? 12 : 0); if (song.style === 'country') { if (step % 2 === 0) mPluck(tt, root + 12 + ti, 0.4, 0.045); } else mLead(tt, root + 12 + ti + (step >= 8 ? 12 : 0), s16*0.8, 0.03, 'square', 700 + (bar % 8)*240); }
+  if (C === 'organ' && step === 0) mOrgan(tt, vs, s16*SPB*0.9, 0.022);
+  if (C === 'keys'){ if (step === 0) mKeys(tt, vs, s16*SPB*0.85, 0.045); if (step === 14 && bar % 2 === 0) mKeys(tt, vs.slice(1), s16*1.5, 0.03); }
+  if (C === 'strum' && (step === 4 || step === 12 || (step === 14 && rr() < 0.5))){ const v2 = [root + 12, ...vs, root + 24], up = step === 14; (up ? v2.slice().reverse() : v2).forEach((m, k) => mPluck(tt + k*0.011, m, 0.28, up ? 0.04 : 0.055)); }
+  if (C === 'pianocomp' && ((step === 0 && rr() < 0.6) || (step === 6 && rr() < 0.75) || (step === 10 && rr() < 0.3) || (step === 14 && rr() < 0.3))) mKeys(tt, [root + 12 + tones[1], root + 12 + (tones[3] || 12), root + 26], s16*1.6, 0.038);
+  if (C === 'bossaguitar' && 'x..x..x...x..x..'[step] === 'x') vs.forEach((m, k) => mPluck(tt + k*0.008, m, 0.22, 0.035));
+  if (C === 'waltzchick' && (step === 4 || step === 8)) vs.forEach((m, k) => mPluck(tt + k*0.01, m, 0.25, 0.04));
+  /* melody: hook in choruses, answer phrases in verses */
+  const pos = (bi % 2)*SPB + step, phrase = Math.floor(bi/2) % 2, base = M.key + 24;
+  const play = (motif, tim, oct, vol) => { for (const n of motif){ if (n.pos === pos){ mLeadT(tt, deg2m(n.deg, base + oct, sc), n.len*s16*0.95, tim, vol); } } };
+  if (sec === 'chorus') play(M.hook[phrase], song.lead, 0, 0.055);
+  else if (sec === 'verse' && phrase === 1) play(M.answer[bi >= 4 ? 1 : 0], song.leadB, -12, 0.045);
+  else if (sec === 'break') play(M.hook[0], song.leadB, -12, 0.035);
+  else if (sec === 'outro' && bi < 2) play(M.hook[1], song.leadB, 0, 0.04);
+  else if (sec === 'intro' && bi >= 2) play(M.answer[0], song.leadB, 0, 0.035);
 }
 function schedMusic(){
   if (!M.on || !AC) return;
@@ -709,13 +793,13 @@ function schedMusic(){
   while (M.next < AC.currentTime + 0.14){
     playStep(M.next);
     M.next += s16(); M.step++;
-    if (M.step >= 16){ M.step = 0; M.bar++; if (M.bar >= M.bars){ M.bar = 0; newTrack(); mBlip(M.next); M.next += 0.45; } }
+    if (M.step >= (M.spb || 16)){ M.step = 0; M.bar++; if (M.bar >= M.bars){ M.bar = 0; newTrack(); mBlip(M.next); M.next += 0.45; } }
   }
 }
 function startMusic(){
   if (M.on || !AC || !S.music) return;
   M.on = true; musicBus();
-  newTrack(M.queued); M.queued = null; M.out.gain.setValueAtTime(MIXV[M.style], AC.currentTime); M.step = 0; M.bar = 0; M.next = AC.currentTime + 0.1;
+  newTrack(M.queued); M.queued = null; M.out.gain.setValueAtTime(MIXV[M.style]*(PLAYLIST[M.song].gain || 1), AC.currentTime); M.step = 0; M.bar = 0; M.next = AC.currentTime + 0.1;
   M.timer = setInterval(schedMusic, 25); updateRadio();
 }
 function stopMusic(){
@@ -1009,7 +1093,7 @@ function openClub(){
   const r = rankOf(S.points), n = nextRank(S.points);
   const pct = n ? (S.points - r[1])/(n[1]-r[1])*100 : 100;
   const log = S.log.slice(-5).reverse().map(t => `<span>${t.river} <span class="muted">· ${t.date||''}</span></span><span class="v">${t.pts>=0?'+':''}${t.pts} pts</span>`).join('') || '<span class="muted">No trips yet.</span><span></span>';
-  openSheet(head('Silt Creek Drift Club', r[0]) + `
+  openSheet(head('Silty Spoon Drift Club', r[0]) + `
     <div><div class="mlabel" style="margin:0 0 4px"><span>${S.points} club points</span><span>${n?`${n[1]-S.points} to ${n[0]}`:'Top rank'}</span></div><div class="bar"><i style="width:${pct}%"></i></div></div>
     <div class="lure" style="grid-template-columns:minmax(0,1fr) auto"><div><h3>Big Gary's loan</h3><small>${S.debt ? `You owe Gary ${money(S.debt)}. It comes out of your next weigh-in automatically.` : `Gary will front you ${money(LOAN)} for gas and spoons. No interest, but he takes it back from your next weigh-in, and you'll hear about it.`}</small></div>
       <button class="btn ${S.debt?'':'good'}" id="loanBtn" ${S.debt?'disabled':''}>${S.debt?'Owed':'Borrow '+money(LOAN)}</button></div>
@@ -2318,7 +2402,7 @@ const PLACES = [
   {id:'cabin',  name:'Your Cabin',            x:110,  w:250, door:250},
   {id:'tackle', name:'Silt Creek Tackle',     x:440,  w:270, door:600},
   {id:'store',  name:'Corner Stop & Fuel',    x:800,  w:390, door:1100},
-  {id:'club',   name:'Silt Creek Drift Club', x:1260, w:320, door:1440},
+  {id:'club',   name:'Silty Spoon Drift Club', x:1260, w:320, door:1440},
   {id:'launch', name:'Boat Launch',           x:1640, w:250, door:1740},
 ];
 const BUSH_X = 760, GARY_X = 1300;
@@ -2531,7 +2615,7 @@ function drawBuilding(c, p, base, u){
     c.beginPath(); c.moveTo(x0 - 20, base - H + 4*u); c.lineTo(x0 + 40, base - H - 48*u); c.lineTo(x1 - 40, base - H - 48*u); c.lineTo(x1 + 20, base - H + 4*u); c.closePath(); c.fill();
     c.strokeStyle = 'rgba(0,0,0,.18)'; c.lineWidth = 1.5; for (let xx = x0 - 10; xx < x1 + 14; xx += 10){ c.beginPath(); c.moveTo(xx, base - H + 4*u); c.lineTo(xx + (xx < (x0 + x1)/2 ? 1 : -1)*6, base - H - 46*u); c.stroke(); }
     c.fillStyle = '#e9e1c8'; c.fillRect(x0 + 30, base - H - 40*u, p.w - 60, 30*u); c.strokeStyle = '#3d2a14'; c.lineWidth = 2; c.strokeRect(x0 + 30, base - H - 40*u, p.w - 60, 30*u);
-    signText(c, 'SILT CREEK DRIFT CLUB', (x0 + x1)/2, base - H - 29*u, Math.min(13*u, (p.w - 70)/12.5), '#264e39'); signText(c, 'EST. 1961', (x0 + x1)/2, base - H - 16*u, 7*u, '#6a4a22', '"Overpass Mono", monospace');
+    signText(c, 'SILTY SPOON DRIFT CLUB', (x0 + x1)/2, base - H - 29*u, Math.min(13*u, (p.w - 70)/12.5), '#264e39'); signText(c, 'EST. 1961', (x0 + x1)/2, base - H - 16*u, 7*u, '#6a4a22', '"Overpass Mono", monospace');
     windowPane(c, x0 + 60, base - 70*u, 50, 34*u, true); windowPane(c, x0 + 128, base - 70*u, 50, 34*u, true);
     c.fillStyle = '#5a3b1f'; c.fillRect(p.door - 40, base - 70*u, 80, 6*u); c.fillRect(p.door - 40, base - 70*u, 4, 70*u); c.fillRect(p.door + 36, base - 70*u, 4, 70*u);
     door(c, p.door, base, u, '#4a2c14');

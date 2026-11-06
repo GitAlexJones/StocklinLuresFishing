@@ -228,21 +228,21 @@ canvas{display:block;width:100%;touch-action:none}
   </header>
   <section id="scTown">
     <div class="status" id="status"></div>
-    <div class="canvas-wrap"><canvas id="tv" aria-label="Silt Creek main street. Tap a building to walk there."></canvas></div>
+    <div class="canvas-wrap"><canvas id="tv" aria-label="Silty Creek main street. Tap a building to walk there."></canvas></div>
     <div class="walkbar">
       <button class="big walk" id="wL" aria-label="Walk left">◀</button>
       <button class="big" id="wEnter" disabled>Walk to a door</button>
       <button class="big walk" id="wR" aria-label="Walk right">▶</button>
     </div>
     <p class="hint">Tap a building to walk there, or hold the arrows.</p>
-    <div class="quick" id="quick"><span>Skip the walk:</span><button data-go="tackle">Tackle</button><button data-go="club" id="qClub">Club</button><button data-go="store">Corner Stop</button><button data-go="cabin">Cabin</button><button data-go="launch">Boat Launch</button></div>
+    <div class="quick" id="quick"><span>Skip the walk:</span><button data-go="tackle">Tackle</button><button data-go="club" id="qClub">Club</button><button data-go="store">Mikey's</button><button data-go="cabin">Cabin</button><button data-go="launch">Boat Launch</button></div>
     <p class="note">Lures are the real Stocklin Lures Silty Spoons, handcrafted in Washington. See <a href="https://www.stocklinlures.com/" target="_blank" rel="noopener">StocklinLures.com</a>. Fish stats, run timing and river regulations in this game are simplified for fun. Check the real WDFW regulations before you fish.</p>
   </section>
 
   <section id="scMap" hidden>
     <div class="status" id="status2"></div>
     <div class="backrow"><button class="x" id="mapBack" aria-label="Back to town">←</button><h1>River report</h1></div>
-    <div class="dateline"><span id="dateMap"></span><button class="btn" id="waitWeek">Wait a week</button></div>
+    <div class="dateline"><span id="dateMap"></span></div>
     <div id="riverList" style="display:grid;gap:10px"></div>
   </section>
 
@@ -351,6 +351,15 @@ const REELS = [
   {id:'reel-tranx', brand:'Shimano', model:'Tranx', price:240, speed:1.32, drag:0.45, note:'Big-power baitcaster for Hanford kings.'},
   {id:'reel-conquest', brand:'Shimano', model:'Calcutta Conquest', price:300, speed:1.34, drag:0.42, note:'Round baitcaster. A river salmon legend.'},
 ];
+const WADERS = [
+  {id:'wader-starter', brand:'Hand-me-down', model:'Leaky Hip Boots', price:0, time:0, note:'One boot has a hole. Your sock knows which one.'},
+  {id:'wader-swiftcurrent', brand:'Patagonia', model:'Swiftcurrent Expedition Zip-Front', price:260, time:0.15, note:'Tough, zip-front and built to be repaired, not replaced.'},
+  {id:'wader-adrenaline', brand:'Dryft', model:'Adrenaline Wader', price:280, time:0.18, note:'Burly fabric for bushwhacking down to the good water.'},
+  {id:'wader-orvispro', brand:'Orvis', model:'PRO Zip Wader', price:300, time:0.2, note:'Stretchy, breathable and comfortable all day.'},
+  {id:'wader-skwala', brand:'Skwala', model:'RS Wader', price:330, time:0.24, note:'Guide-grade toughness for cold winter steelhead days.'},
+  {id:'wader-g4z', brand:'Simms', model:'G4Z Stockingfoot', price:360, time:0.28, note:'Top of the line. Every guide on the river wants a pair.'},
+];
+const WADER = () => WADERS.find(r => r.id === S.wader) || WADERS[0];
 const ROD = () => RODS.find(r => r.id === S.rod) || RODS[0];
 const REEL = () => REELS.find(r => r.id === S.reel) || REELS[0];
 const castLo = () => 0.4 - ROD().cast/2, castHi = () => Math.min(0.97, 0.9 + ROD().cast/2);
@@ -419,7 +428,7 @@ const RICK_LINES = [
   "WDFW advisory board? They don't even read the advisory board's emails, chat.",
 ];
 const RICK_TOWN = [
-  "What's up River Rowdies! Live from beautiful downtown Silt Creek!",
+  "What's up River Rowdies! Live from beautiful downtown Silty Creek!",
   "Chat, WDFW dropped another emergency rule. On a Tuesday. Again.",
   "North of Falcon? More like North of FISHIN', am I right chat?",
   "I'm not saying WDFW needs new leadership. Chat is saying it. I'm just reading chat.",
@@ -434,7 +443,7 @@ const DISGUISES = ['a suspiciously tidy shrub','a stump that just blinked','a "b
 
 /* ================= save ================= */
 const KEY = 'stocklin-fishing-v2';
-const DEF = {cash:60, gas:12, tank:20, license:false, lures:{'min-chrome':2}, equipped:'min-chrome', points:0, records:{}, journal:{}, legends:{}, log:[], jerky:false, seenIntro:false, trips:0, week:0, cweek:-1, contracts:[], sound:true, debt:0, shiftWeek:-1, squatch:0, squatchTownWeek:-1, music:true, rickWeek:-1, rod:'rod-starter', reel:'reel-starter', gear:['rod-starter','reel-starter']};
+const DEF = {cash:60, gas:12, tank:20, license:false, lures:{'min-chrome':2}, equipped:'min-chrome', points:0, records:{}, journal:{}, legends:{}, log:[], jerky:false, seenIntro:false, trips:0, week:0, cweek:-1, contracts:[], sound:true, debt:0, shiftWeek:-1, squatch:0, squatchTownWeek:-1, music:true, rickWeek:-1, rod:'rod-starter', reel:'reel-starter', wader:'wader-starter', gear:['rod-starter','reel-starter','wader-starter']};
 const fresh = () => JSON.parse(JSON.stringify(DEF));
 let S;
 try {
@@ -458,14 +467,20 @@ function save(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e) 
   }
   if (!L(S.equipped)){ S.equipped = Object.keys(S.lures || {}).find(k => L(k) && S.lures[k] > 0) || 'min-chrome'; changed = true; }
   if ((S.contracts || []).some(c => c.lure && !L(c.lure))){ S.cweek = -1; changed = true; }
+  if (!S.gear.includes('wader-starter')){ S.gear.push('wader-starter'); changed = true; }
   if (changed) save();
 })();
 
 /* ================= calendar & conditions ================= */
-const START = new Date(2026, 8, 7);
-function weekDate(w){ const d = new Date(START); d.setDate(d.getDate() + 7*w); return d; }
-const curMonth = () => weekDate(S.week).getMonth();
-function weekLabel(){ const d = weekDate(S.week); return `Week of ${MON[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`; }
+/* The game runs on the real clock: one game day = one real 24-hour day. S.week holds the real local day number. */
+const DOW = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const dayIndex = (d = new Date()) => Math.floor((d.getTime() - d.getTimezoneOffset()*60000)/86400000);
+const curMonth = () => new Date().getMonth();
+function fmtTime(d = new Date()){ let h = d.getHours(); const m = d.getMinutes(), ap = h >= 12 ? 'PM' : 'AM'; h = h % 12 || 12; return `${h}:${String(m).padStart(2,'0')} ${ap}`; }
+function weekLabel(){ const d = new Date(); return `${DOW[d.getDay()]}, ${MON[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`; }
+function tripStamp(ts){ const d = new Date(ts); return `${MON[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()} · ${fmtTime(d)}`; }
+function syncDay(){ const di = dayIndex(); if (S.week === di) return false; S.week = di; if (!G) genContracts(); save(); return true; }
+S.week = dayIndex();
 const inSeason = (sp, m = curMonth()) => SPECIES[sp].mo.includes(m);
 function cond(r){
   const i = RIVERS.indexOf(r), m = curMonth(), wet = [9,10,11,0,1,2].includes(m);
@@ -508,10 +523,17 @@ function jobText(c){
 }
 const jobPay = c => [c.cash ? money(c.cash) : '', c.pts ? `+${c.pts} pts` : ''].filter(Boolean).join(' · ');
 if (S.cweek !== S.week) genContracts();
+setInterval(() => { if (syncDay() && !G) renderTown(); const dm = document.getElementById('dateMap'); if (dm) dm.textContent = weekLabel() + ' · ' + fmtTime(); }, 20000);
+document.addEventListener('visibilitychange', () => { if (!document.hidden && syncDay() && !G) renderTown(); });
 
 /* ================= sound ================= */
 let AC = null;
-function ac(){ try { if (!AC) AC = new (window.AudioContext || window.webkitAudioContext)(); if (AC.state === 'suspended') AC.resume(); } catch(e) { AC = null; } return AC; }
+function ac(){ try {
+  if (!AC){ try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch(e){} AC = new (window.AudioContext || window.webkitAudioContext)(); AC.onstatechange = () => { if (AC.state === 'running') resyncMusic(); }; }
+  if (AC.state !== 'running' && AC.state !== 'closed' && !document.hidden){ const p = AC.resume(); if (p && p.then) p.then(resyncMusic, () => {}); }
+  if (!AC._unlocked){ const b = AC.createBuffer(1, 1, 22050), src = AC.createBufferSource(); src.buffer = b; src.connect(AC.destination); src.start(0); AC._unlocked = true; }
+} catch(e) { AC = null; } return AC; }
+function resyncMusic(){ if (M.on && AC && M.next < AC.currentTime + 0.02){ M.next = AC.currentTime + 0.08; } }
 function tone(f, d, type='sine', vol=0.15, f2=null, delay=0){
   const a = S.sound && ac(); if (!a) return;
   const t = a.currentTime + delay, o = a.createOscillator(), g = a.createGain();
@@ -544,7 +566,7 @@ function sfx(n){
   if (n==='legend') [392,523,659,784,1046,1318].forEach((f,i) => tone(f, 0.25, 'triangle', 0.07, null, i*0.1));
 }
 
-/* ================= Silt Creek Radio (generated music) ================= */
+/* ================= Silty Creek Radio (generated music) ================= */
 const QUAL = {M:[0,4,7], m:[0,3,7], maj7:[0,4,7,11], m7:[0,3,7,10], '7':[0,4,7,10]};
 const PENT_MIN = [0,3,5,7,10], PENT_MAJ = [0,2,4,7,9], BOP = [0,2,4,5,7,9,10];
 const TITLE_A = ['Tailout','Riffle','Tidewater','Jet Sled','Gravel Bar','Fog Bank','Backtroll','Plunker\'s','Eddy Line','Hatchery','Sasquatch','Chrome','Silty','Nooksack','Rainy Day','Chum Run','Skagit','Steelhead','Low Water','Boat Ramp'];
@@ -555,7 +577,7 @@ const MUS = {
     progs:[[[0,'M'],[5,'M'],[0,'M'],[7,'M']],[[0,'M'],[7,'M'],[9,'m'],[5,'M']],[[0,'M'],[0,'M'],[5,'M'],[7,'M']]]},
   hiphop:{label:'Hip hop', artists:['MC Adipose','Lil Smolt','Big Chum Beats'], words:['Cypher','Beat Tape','Flow','Freestyle','Boom Bap','Remix'], bpm:[84,92], keys:[45,46,48,50],
     progs:[[[0,'m7'],[5,'m7'],[8,'maj7'],[7,'7']],[[0,'m7'],[3,'maj7'],[10,'7'],[5,'m7']],[[0,'m7'],[8,'maj7'],[5,'m7'],[7,'7']]]},
-  jazz:{label:'Jazz', artists:['The Silt Creek Quartet','Eddy Line Trio','Tailout Trio'], words:['Swing','Stomp','Bop','Blues','Standard','Waltz Away'], bpm:[132,160], keys:[41,43,44,46,48],
+  jazz:{label:'Jazz', artists:['The Silty Creek Quartet','Eddy Line Trio','Tailout Trio'], words:['Swing','Stomp','Bop','Blues','Standard','Waltz Away'], bpm:[132,160], keys:[41,43,44,46,48],
     progs:[[[2,'m7'],[7,'7'],[0,'maj7'],[9,'7']],[[0,'maj7'],[9,'7'],[2,'m7'],[7,'7']]]},
 };
 const MIXV = {electronic:0.17, country:0.16, hiphop:0.27, jazz:0.32};
@@ -604,7 +626,7 @@ const PLAYLIST = [
   {title:'Jet Sled Voltage', artist:'Smolt Machine', style:'electronic', bpm:126, key:45, scale:'minor', prog:[[0,'m'],[8,'M'],[3,'M'],[10,'M']], drum:'four', bass:'offbeat', comp:'stabs', lead:'supersaw', leadB:'pluck', tpl:0, seed:101},
   {title:'Tailout Shuffle', artist:'Two-Rod Terry & the Plunkers', style:'country', bpm:112, key:43, scale:'major', swing:0.3, prog:[[0,'M'],[5,'M'],[0,'M'],[7,'M']], drum:'shuffle', bass:'rootfive', comp:'strum', lead:'pluck', leadB:'harmonica', tpl:1, seed:202},
   {title:'Chum Run Remix', artist:'Big Chum Beats', style:'hiphop', bpm:90, key:45, scale:'minor', swing:0.28, prog:[[0,'m7'],[5,'m7'],[8,'maj7'],[7,'7']], drum:'boombap', bass:'sub', comp:'keys', lead:'vibes', leadB:'bell', tpl:3, seed:303, crackle:true},
-  {title:'Steelhead Swing', artist:'The Silt Creek Quartet', style:'jazz', bpm:168, key:41, scale:'major', swing8:true, prog:[[2,'m7'],[7,'7'],[0,'maj7'],[9,'7']], drum:'swing', bass:'walk', comp:'pianocomp', lead:'sax', leadB:'vibes', tpl:4, seed:404},
+  {title:'Steelhead Swing', artist:'The Silty Creek Quartet', style:'jazz', bpm:168, key:41, scale:'major', swing8:true, prog:[[2,'m7'],[7,'7'],[0,'maj7'],[9,'7']], drum:'swing', bass:'walk', comp:'pianocomp', lead:'sax', leadB:'vibes', tpl:4, seed:404},
   {title:'Glacial Milk', artist:'Silty Circuits', style:'electronic', bpm:96, key:47, scale:'minor', cb:2, prog:[[0,'m'],[5,'m'],[10,'M'],[3,'M']], drum:'halftime', bass:'sub', comp:'pad', lead:'bell', leadB:'flute', tpl:2, seed:505, gain:1.6},
   {title:'Gravel Bar Boogie', artist:'The Gravel Bar Boys', style:'country', bpm:146, key:45, scale:'blues', prog:[[0,'7'],[0,'7'],[5,'7'],[0,'7'],[7,'7'],[5,'7'],[0,'7'],[7,'7']], drum:'train', bass:'boogie', comp:'stabs', lead:'piano', leadB:'harmonica', tpl:4, seed:606},
   {title:'Adipose Clipped', artist:'MC Adipose', style:'hiphop', bpm:140, key:48, scale:'minor', cb:2, prog:[[0,'m'],[0,'m'],[8,'M'],[7,'M']], drum:'trap', bass:'sub808', comp:'pad', lead:'flute', leadB:'pluck', tpl:1, seed:707},
@@ -615,8 +637,8 @@ const PLAYLIST = [
   {title:'Hatchery Bop', artist:'Tailout Trio', style:'jazz', bpm:208, key:46, scale:'major', swing8:true, prog:[[0,'maj7'],[9,'7'],[2,'m7'],[7,'7']], drum:'bebop', bass:'walk', comp:'pianocomp', lead:'sax', leadB:'piano', tpl:4, seed:1212},
   {title:'Tidewater Pulse', artist:'Smolt Machine', style:'electronic', bpm:128, key:48, scale:'minor', prog:[[0,'m'],[10,'M'],[8,'M'],[7,'m']], drum:'twostep', bass:'syncopated', comp:'organ', lead:'whistle', leadB:'vibes', tpl:3, seed:1313},
   {title:'Rainy Day Two-Step', artist:'Two-Rod Terry & the Plunkers', style:'country', bpm:100, key:48, scale:'major', meter:3, prog:[[0,'M'],[7,'M'],[9,'m'],[5,'M']], drum:'waltz', bass:'waltz', comp:'waltzchick', lead:'steel', leadB:'whistle', tpl:0, seed:1414, gain:1.9},
-  {title:'Silt Creek Beat Tape', artist:'Big Chum Beats', style:'hiphop', bpm:78, key:50, scale:'major', swing:0.32, prog:[[0,'maj7'],[9,'m7'],[2,'m7'],[7,'7']], drum:'lofi', bass:'sub', comp:'pianocomp', lead:'sax', leadB:'vibes', tpl:2, seed:1515, crackle:true},
-  {title:'Low Water Standard', artist:'The Silt Creek Quartet', style:'jazz', bpm:120, key:44, scale:'major', prog:[[2,'m7'],[7,'7'],[0,'maj7'],[0,'maj7']], drum:'bossa', bass:'bossa', comp:'bossaguitar', lead:'flute', leadB:'vibes', tpl:1, seed:1616},
+  {title:'Silty Creek Beat Tape', artist:'Big Chum Beats', style:'hiphop', bpm:78, key:50, scale:'major', swing:0.32, prog:[[0,'maj7'],[9,'m7'],[2,'m7'],[7,'7']], drum:'lofi', bass:'sub', comp:'pianocomp', lead:'sax', leadB:'vibes', tpl:2, seed:1515, crackle:true},
+  {title:'Low Water Standard', artist:'The Silty Creek Quartet', style:'jazz', bpm:120, key:44, scale:'major', prog:[[2,'m7'],[7,'7'],[0,'maj7'],[0,'maj7']], drum:'bossa', bass:'bossa', comp:'bossaguitar', lead:'flute', leadB:'vibes', tpl:1, seed:1616},
   {title:'Night Bite Protocol', artist:'DJ Wobbler', style:'electronic', bpm:110, key:50, scale:'phrygian', prog:[[0,'m'],[1,'M'],[0,'m'],[10,'M']], drum:'synth', bass:'pulse8', comp:'pad', lead:'brass', leadB:'square', tpl:2, seed:1717},
   {title:'Corner Stop Ramble', artist:'The Gravel Bar Boys', style:'country', bpm:96, key:50, scale:'major', prog:[[0,'M'],[9,'m'],[5,'M'],[7,'M']], drum:'ballad', bass:'pulse8', comp:'arp', lead:'harmonica', leadB:'steel', tpl:3, seed:1818},
   {title:'Fog Bank Flow', artist:'MC Adipose', style:'hiphop', bpm:142, key:45, scale:'minor', cb:2, prog:[[0,'m'],[8,'M'],[5,'m'],[7,'M']], drum:'drill', bass:'sub808', comp:'stabs', lead:'piano', leadB:'bell', tpl:3, seed:1919},
@@ -788,8 +810,9 @@ function playStep(t){
   else if (sec === 'intro' && bi >= 2) play(M.answer[0], song.leadB, 0, 0.035);
 }
 function schedMusic(){
-  if (!M.on || !AC) return;
+  if (!M.on || !AC || AC.state !== 'running') return;
   const s16 = () => 60/M.bpm/4;
+  if (M.next < AC.currentTime - 0.05) M.next = AC.currentTime + 0.05;
   while (M.next < AC.currentTime + 0.14){
     playStep(M.next);
     M.next += s16(); M.step++;
@@ -811,7 +834,7 @@ function skipTrack(idx){ if (!M.on){ S.music = true; save(); ac(); M.queued = id
 function openPlaylist(){
   const rows = PLAYLIST.map((sg, i) => `<button class="lure plrow ${M.on && M.song === i ? 'eq' : ''}" data-song="${i}" style="grid-template-columns:28px minmax(0,1fr) auto;text-align:left;width:100%">
     <span class="mono muted">${String(i + 1).padStart(2,'0')}</span><span style="min-width:0"><h3>${sg.title}</h3><small>${sg.artist}</small></span><span class="chip">${MUS[sg.style].label}</span></button>`).join('');
-  openSheet(head('Silt Creek Radio', '20-song playlist') + `<p class="muted" style="margin:0">Shuffles through all 20 without repeating a style back to back. Tap a song to play it.</p>` + rows);
+  openSheet(head('Silty Creek Radio', '20-song playlist') + `<p class="muted" style="margin:0">Shuffles through all 20 without repeating a style back to back. Tap a song to play it.</p>` + rows);
   $('#sheetCard').onclick = e => { const b2 = e.target.closest('[data-song]'); if (!b2) return; ac(); skipTrack(+b2.dataset.song); closeSheet(); };
 }
 function updateRadio(){
@@ -825,10 +848,11 @@ $('#rPlay').addEventListener('click', () => { if (M.on){ S.music = false; save()
 $('#rSkip').addEventListener('click', () => { ac(); skipTrack(); });
 document.querySelector('#radio .rtxt').addEventListener('click', openPlaylist);
 if (document.addEventListener){
-  const kick = () => { if (S.music && !M.on){ ac(); startMusic(); } };
-  document.addEventListener('pointerdown', kick, true);
-  document.addEventListener('keydown', kick, true);
-  document.addEventListener('visibilitychange', () => { if (!AC) return; try { document.hidden ? AC.suspend() : AC.resume(); } catch(e){} });
+  const kick = () => { if (!S.music && !S.sound) return; ac(); if (S.music && !M.on) startMusic(); else resyncMusic(); };
+  ['pointerdown','touchend','click','keydown'].forEach(ev => document.addEventListener(ev, kick, true));
+  const wake = () => { if (!AC || document.hidden) return; try { const p = AC.resume(); if (p && p.then) p.then(resyncMusic, () => {}); } catch(e){} resyncMusic(); };
+  document.addEventListener('visibilitychange', () => { if (!AC) return; if (document.hidden){ try { AC.suspend(); } catch(e){} } else wake(); });
+  window.addEventListener('pageshow', wake); window.addEventListener('focus', wake);
 }
 updateRadio();
 
@@ -997,10 +1021,12 @@ const head = (eyebrow, title, closable=true) => `<div class="sheet-head"><div><d
 let SHOP_TAB = 'spoons';
 function bar5(v, max){ const n = Math.round(v/max*5); return '<span class="pips">' + [0,1,2,3,4].map(i => `<i class="${i < n ? 'on' : ''}"></i>`).join('') + '</span>'; }
 function gearRows(list, kind){
-  const cur = kind === 'rod' ? S.rod : S.reel;
+  const cur = kind === 'rod' ? S.rod : kind === 'wader' ? S.wader : S.reel;
   return list.map(g => {
     const own = S.gear.includes(g.id), on = cur === g.id;
-    const stats = kind === 'rod'
+    const stats = kind === 'wader'
+      ? `<div class="stat2"><span>Trip time</span>${bar5(g.time, 0.28)}</div><small class="muted">${g.time ? `+${Math.round(g.time*100)}% longer on the water` : 'No bonus'}</small>`
+      : kind === 'rod'
       ? `<div class="stat2"><span>Fight zone</span>${bar5(g.zone, 0.1)}</div><div class="stat2"><span>Casting</span>${bar5(g.cast, 0.11)}</div>`
       : `<div class="stat2"><span>Reel speed</span>${bar5(g.speed - 1, 0.34)}</div><div class="stat2"><span>Drag</span>${bar5(1 - g.drag, 0.58)}</div>`;
     return `<div class="lure gear ${on ? 'eq' : ''}" style="grid-template-columns:minmax(0,1fr) auto">
@@ -1029,13 +1055,26 @@ function shopHTML(inTrip){
       </div>
     </div>`).join('');
   if (inTrip) return head('Your tackle box','Change lures') + `<p class="muted" style="margin:0">The water is <b>${water}</b> today. A spoon that matches the water color gets more bites and a wider fight zone. A spoon that matches the species draws more of that fish and scores +20%.</p><p class="muted" style="margin:0">Rigged on: ${ROD().brand} ${ROD().model} with a ${REEL().brand} ${REEL().model}.</p>` + rows;
-  const tabs = `<div class="tabs" role="tablist">${[['spoons','Stocklin Spoons'],['rods','Rods'],['reels','Reels']].map(([k,l]) => `<button role="tab" aria-selected="${tab===k}" data-tab="${k}">${l}</button>`).join('')}</div>`;
+  const tabs = `<div class="tabs" role="tablist">${[['spoons','Silty Spoons'],['rods','Rods'],['reels','Reels'],['waders','Waders']].map(([k,l]) => `<button role="tab" aria-selected="${tab===k}" data-tab="${k}">${l}</button>`).join('')}</div>`;
   const cash = `<p class="muted" style="margin:0">Cash: <b class="mono">${money(S.cash)}</b>. ${tab==='spoons' ? 'Spoons get lost to snags, snapped lines and sea lions. Water and species tags are game stats, not Stocklin\'s official advice.' : tab==='rods' ? 'A better rod gives you a wider green zone when you cast and when you fight a fish.' : 'A better reel brings fish in faster (handy when a sea lion is coming) and snaps less when you Horse it.'} You keep everything you buy.</p>`;
   let body = '';
   if (tab === 'spoons') body = `<div class="logoplate"><img src="${LOGO_SRC}" alt="The Silty Spoon, Stocklin Lures"></div><div class="board"><b>Shop owner says:</b> Silty water? Radioactive or Chartreuse. Clear water? Chrome UV, Bone Crackle or the Dace. Stained water? The Coppers shine. Big kings? Fire Bite or Redhot. And quit snagging the bottom.</div>` + cash + rows;
   if (tab === 'rods') body = `<div class="board"><b>Shop owner says:</b> That garage sale rod is how you lose a 30-pound king. Rod stats are game stats, not the makers' specs.</div>` + cash + gearRows(RODS, 'rod');
+  if (tab === 'waders') body = `<div class="board"><b>Shop owner says:</b> Dry, warm feet means you stay out longer. Good waders add trip time. Wader stats are game stats, not the makers' specs.</div>` + `<p class="muted" style="margin:0">Cash: <b class="mono">${money(S.cash)}</b>.</p>` + gearRows(WADERS, 'wader');
   if (tab === 'reels') body = `<div class="board"><b>Shop owner says:</b> Sea lions at Longview are faster than that rusty reel. Reel stats are game stats, not the makers' specs.</div>` + cash + gearRows(REELS, 'reel');
-  return head('Silt Creek Tackle', tab==='spoons' ? 'Stocklin Silty Spoons' : tab==='rods' ? 'Rods' : 'Reels') + tabs + body;
+  return head('Silty Creek Tackle', tab==='spoons' ? 'Silty Spoons' : tab==='rods' ? 'Rods' : tab==='waders' ? 'Waders' : 'Reels') + tabs + body;
+}
+function enterStore(){
+  if (S.license){ openStore(); return; }
+  const lines = ['Hey, you got your fishing license yet? Pruitt was in here this morning asking who\'s been buying them.', 'Before you pump that gas, you got your license? Warden\'s been hiding in the bushes out back again.', 'You buy your license yet? I sell \'em right here. Saves you a $150 ticket.'];
+  const can = S.cash >= LICENSE;
+  openSheet(head('Mikey\'s Corner Stop and Fuel', 'The clerk leans over the counter') + `
+    <div class="board"><b>Clerk asks:</b> ${lines[S.week % lines.length]}</div>
+    <p style="margin:0">You don't have one. A license is <b>${money(LICENSE)}</b> and lasts forever. Getting caught without one is a <b>$150 ticket</b>.</p>
+    ${can ? '' : `<p class="muted" style="margin:0">You have ${money(S.cash)}. Work a shift here or borrow from Big Gary at the Drift Club.</p>`}
+    <div class="row"><button class="btn grow" id="licLater">Not yet</button><button class="btn pri grow" id="licBuy" ${can ? '' : 'disabled'}>Buy license (${money(LICENSE)})</button></div>`);
+  $('#licLater').onclick = () => openStore();
+  $('#licBuy').onclick = () => { if (S.cash < LICENSE) return; S.cash = +(S.cash - LICENSE).toFixed(2); S.license = true; sfx('cash'); save(); openStore(); };
 }
 function openShop(inTrip=false){
   openSheet(shopHTML(inTrip), inTrip ? updateLureChip : null);
@@ -1045,9 +1084,9 @@ function openShop(inTrip=false){
     if (b){ const l = L(b.dataset.buy); if (S.cash >= l.price){ S.cash = +(S.cash - l.price).toFixed(2); S.lures[l.id] = (S.lures[l.id]||0)+1; if (!S.lures[S.equipped]) S.equipped = l.id; sfx('cash'); save(); } }
     else if (q){ S.equipped = q.dataset.eq; save(); }
     else if (tb){ SHOP_TAB = tb.dataset.tab; top = true; }
-    else if (gb){ const [kind, id] = gb.dataset.gear.split(':'), g = (kind === 'rod' ? RODS : REELS).find(x => x.id === id);
-      if (g && S.cash >= g.price && !S.gear.includes(id)){ S.cash = +(S.cash - g.price).toFixed(2); S.gear.push(id); if (kind === 'rod') S.rod = id; else S.reel = id; sfx('cash'); save(); renderTown(); } }
-    else if (ub){ const [kind, id] = ub.dataset.use.split(':'); if (S.gear.includes(id)){ if (kind === 'rod') S.rod = id; else S.reel = id; save(); } }
+    else if (gb){ const [kind, id] = gb.dataset.gear.split(':'), g = (kind === 'rod' ? RODS : kind === 'wader' ? WADERS : REELS).find(x => x.id === id);
+      if (g && S.cash >= g.price && !S.gear.includes(id)){ S.cash = +(S.cash - g.price).toFixed(2); S.gear.push(id); if (kind === 'rod') S.rod = id; else if (kind === 'wader') S.wader = id; else S.reel = id; sfx('cash'); save(); renderTown(); } }
+    else if (ub){ const [kind, id] = ub.dataset.use.split(':'); if (S.gear.includes(id)){ if (kind === 'rod') S.rod = id; else if (kind === 'wader') S.wader = id; else S.reel = id; save(); } }
     else return;
     const st = $('#sheetCard').scrollTop; $('#sheetCard').innerHTML = shopHTML(inTrip); $('#sheetCard').scrollTop = top ? 0 : st;
     const x = $('#sheetCard .x'); if (x) x.onclick = closeSheet;
@@ -1058,7 +1097,7 @@ function openShop(inTrip=false){
 const GAS_PRICE = 4.79, LICENSE = 30, JERKY = 3;
 function storeHTML(){
   const room = +(S.tank - S.gas).toFixed(1), fillCost = +(room*GAS_PRICE).toFixed(2);
-  return head('Corner Stop & Fuel','Gas, license, snacks') + `
+  return head('Mikey\'s Corner Stop and Fuel','Gas, license, snacks') + `
   <div class="board"><b>Clerk:</b> Pump 3 is the only one that works. License counter's by the nightcrawlers. Warden was in here earlier buying a fake mustache. Weird guy.</div>
   <div class="kv"><span>Sled tank</span><span class="v">${S.gas.toFixed(1)} / ${S.tank} gal</span><span>Gas price</span><span class="v">${money(GAS_PRICE)}/gal</span><span>Your cash</span><span class="v">${money(S.cash)}</span></div>
   <div class="row">
@@ -1070,7 +1109,7 @@ function storeHTML(){
     <button class="btn pri" data-l="1" ${S.license||S.cash<LICENSE?'disabled':''}>${S.license?'Owned':money(LICENSE)}</button></div>
   <div class="lure" style="grid-template-columns:minmax(0,1fr) auto"><div><h3>Lucky Teriyaki Jerky</h3><small>${S.jerky?'In your pocket. +15% bites next trip.':'+15% bites on your next trip. Science.'}</small></div>
     <button class="btn" data-j="1" ${S.jerky||S.cash<JERKY?'disabled':''}>${S.jerky?'Got it':money(JERKY)}</button></div>
-  <div class="lure" style="grid-template-columns:minmax(0,1fr) auto"><div><h3>Work a shift</h3><small>${S.shiftWeek===S.week?'You already worked this week. Come back next week.':`Stock the bait cooler, sweep the lot, listen to the clerk's theories. Pays ${money(SHIFT_PAY)} plus ${SHIFT_GAS} gal of gas. Once a week.`}</small></div>
+  <div class="lure" style="grid-template-columns:minmax(0,1fr) auto"><div><h3>Work a shift</h3><small>${S.shiftWeek===S.week?'You already worked today. Come back tomorrow.':`Stock the bait cooler, sweep the lot, listen to the clerk's theories. Pays ${money(SHIFT_PAY)} plus ${SHIFT_GAS} gal of gas. Once a week.`}</small></div>
     <button class="btn good" data-w="1" ${S.shiftWeek===S.week?'disabled':''}>${S.shiftWeek===S.week?'Done':'+'+money(SHIFT_PAY)}</button></div>`;
 }
 const SHIFT_PAY = 18, SHIFT_GAS = 4, LOAN = 40;
@@ -1092,12 +1131,12 @@ const jobsHTML = () => S.contracts.map(c => `<div class="job"><span class="box">
 function openClub(){
   const r = rankOf(S.points), n = nextRank(S.points);
   const pct = n ? (S.points - r[1])/(n[1]-r[1])*100 : 100;
-  const log = S.log.slice(-5).reverse().map(t => `<span>${t.river} <span class="muted">· ${t.date||''}</span></span><span class="v">${t.pts>=0?'+':''}${t.pts} pts</span>`).join('') || '<span class="muted">No trips yet.</span><span></span>';
+  const log = S.log.slice(-5).reverse().map(t => `<span>${t.river} <span class="muted">${t.ts ? '· ' + tripStamp(t.ts).replace(/, \d{4}/,'') : ''}</span></span><span class="v">${t.pts>=0?'+':''}${t.pts} pts</span>`).join('') || '<span class="muted">No trips yet.</span><span></span>';
   openSheet(head('Silty Spoon Drift Club', r[0]) + `
     <div><div class="mlabel" style="margin:0 0 4px"><span>${S.points} club points</span><span>${n?`${n[1]-S.points} to ${n[0]}`:'Top rank'}</span></div><div class="bar"><i style="width:${pct}%"></i></div></div>
     <div class="lure" style="grid-template-columns:minmax(0,1fr) auto"><div><h3>Big Gary's loan</h3><small>${S.debt ? `You owe Gary ${money(S.debt)}. It comes out of your next weigh-in automatically.` : `Gary will front you ${money(LOAN)} for gas and spoons. No interest, but he takes it back from your next weigh-in, and you'll hear about it.`}</small></div>
       <button class="btn ${S.debt?'':'good'}" id="loanBtn" ${S.debt?'disabled':''}>${S.debt?'Owed':'Borrow '+money(LOAN)}</button></div>
-    <div class="board"><b>Job board · ${weekLabel()}</b>${jobsHTML()}<div style="color:#5b5240;font-size:13px;margin-top:4px">Jobs pay at the weigh-in and reset every week.</div></div>
+    <div class="board"><b>Job board · ${weekLabel()}</b>${jobsHTML()}<div style="color:#5b5240;font-size:13px;margin-top:4px">Jobs pay at the weigh-in and reset at midnight.</div></div>
     <div class="board" style="transform:rotate(.5deg)"><b>Club rules:</b><br>1. Points come from the weigh-in after every trip.<br>2. Illegal fish score zero.<br>3. Releasing a wild fish earns a Good Steward bonus.<br>4. Match your Stocklin spoon to the fish: +20%.<br>5. Clean fight (fish never leaves your zone): +25%.<br>6. Do NOT chase sea lions. That's a federal thing.<br>7. Do not feed Rowdy Rick's comment section.</div>
     <div><div class="eyebrow" style="margin-bottom:6px">Ranks unlock rivers</div><div class="kv">${RANKS.map((k,i)=>`<span class="${S.points>=k[1]?'':'muted'}">${k[0]}</span><span class="v ${S.points>=k[1]?'':'muted'}">${k[1]} · ${RIVERS[i].name.replace(' River','')}</span>`).join('')}</div></div>
     <div><div class="eyebrow" style="margin-bottom:6px">Recent trips</div><div class="kv">${log}</div></div>
@@ -1136,7 +1175,7 @@ function openHelp(){
   openSheet(head('Bait Shop Bench','How it works') + `
   <div class="kv" style="grid-template-columns:auto minmax(0,1fr);gap:8px 12px">
     <b>1</b><span>Gas and a license come from the <b>Corner Stop</b>. Stocklin spoons from the <b>Tackle</b> shop.</span>
-    <b>2</b><span>The <b>Boat Launch</b> shows each river's flow, water color and what's running. Each trip takes a week, and the runs change with the calendar.</span>
+    <b>2</b><span>The <b>Boat Launch</b> shows each river's flow, water color and what's running. The game runs on real time: a game day is a real 24-hour day, the town and rivers follow your clock, and the runs change with the real calendar. Jobs and the shift reset at midnight.</span>
     <b>3</b><span><b>Drag</b> on the river to steer. Dodge rocks, logs, gravel bars and angry sled guys.</span>
     <b>4</b><span>Rippling <b>slots</b> show fish shadows. Bigger shadow, bigger fish. A gold slot is a river legend.</span>
     <b>5</b><span><b>Drop Anchor</b>, then press and hold <b>Cast</b>. A marker slides out over the water. Let go when it's on the slot (the green part of the meter).</span>
@@ -1160,7 +1199,7 @@ function regsText(r){
 }
 function renderMap(){
   $('#status2').innerHTML = statusHTML();
-  $('#dateMap').textContent = weekLabel();
+  $('#dateMap').textContent = weekLabel() + ' · ' + fmtTime();
   $('#riverList').innerHTML = RIVERS.map((r,i) => {
     const locked = S.points < r.need, c = cond(r);
     const lg = !S.legends[r.legend.id] && r.legend.mo.includes(curMonth()) && c.flow !== 'Blown out';
@@ -1178,7 +1217,7 @@ $('#riverList').addEventListener('click', e => {
   const r = RIVERS.find(x => x.id === b.dataset.r);
   if (S.points < r.need || S.gas < r.gas + 1) return;
   if (!Object.values(S.lures).some(n => n > 0)){
-    openSheet(head('Hold up','No lures!') + `<p style="margin:0">Your tackle box is empty. Swing by Silt Creek Tackle first.</p><button class="btn pri" id="toShop">Go to the tackle shop</button>`);
+    openSheet(head('Hold up','No lures!') + `<p style="margin:0">Your tackle box is empty. Swing by Silty Creek Tackle first.</p><button class="btn pri" id="toShop">Go to the tackle shop</button>`);
     $('#toShop').onclick = () => { closeSheet(); show('scTown'); openShop(); }; return;
   }
   ac();
@@ -1194,7 +1233,6 @@ $('#riverList').addEventListener('click', e => {
   }
   startTrip(r);
 });
-$('#waitWeek').onclick = () => { S.week++; genContracts(); save(); renderMap(); };
 
 /* ================= river engine ================= */
 const cv = $('#cv'), ctx = cv.getContext('2d');
@@ -1227,16 +1265,16 @@ function startTrip(river){
   const c = cond(river), lg = river.legend;
   const legendOn = !S.legends[lg.id] && lg.mo.includes(curMonth()) && c.flow !== 'Blown out' && Math.random() < 0.45;
   G = {river, cond:c, t:0, worldY:0, px:CW/2, targetX:null, keyX:0, speed:0, anchored:false, hull:3, hitCD:0,
-    clock:360, end:1020, objs:[], nextSpawn:260, nextHot:360, sledT:rand(2,4), pinnT: river.pinn ? rand(3,8) : 1e9,
-    legendAt: legendOn ? rand(1400, 3200) : null,
+    clock:360, end:Math.round(360 + 660*(1 + WADER().time)), objs:[], nextSpawn:260, nextHot:360, sledT:rand(2,4), pinnT: river.pinn ? rand(3,8) : 1e9,
+    legendAt: legendOn ? rand(1400, 3200) : null, stankAt: rand(650, 1500),
     cooler:[], relPts:0, bonus:0, bonusCash:0, clout:0, fines:0, stolen:0, jobsDone:[], legendCaught:null, harassed:false, harassFined:false, chased:false,
     phase:'cruise', holding:false, castT:0, castQ:1, lureDist:0, f:null, hot:null, spook:0, nib:0, nibT:0, biteT:0, pendingFish:null,
     wardenAt:rand(0.2,0.7), wardenDone:Math.random()<0.15, squatchAt: Math.random() < 0.55 ? rand(0.08, 0.9) : null, squatch:null, squatchSeen:false, photoCash:0, rickAt:[rand(0.1,0.45), rand(0.55,0.85)].filter(()=>Math.random()<0.7),
     rick:null, warden:null, hunt:null, modal:false, lockSheet:false, bubbles:[], jerky:S.jerky, tickT:0, splashes:[], flash:0, wake:[], castHeld:false};
   if (S.jerky){ S.jerky = false; save(); }
   G.px = rcx(0);
-  { const nm = river.name.replace(' River',''); G.cine = {t:0, dur:3.6, title:(nm.startsWith('Hanford') ? '' : 'THE ') + nm.toUpperCase(), sub:`${weekLabel().replace('Week of ','').replace(/, \d{4}/,'')} · ${c.flow} · ${c.water} water`}; }
-  say('River', `${weekLabel()}. The ${river.name.replace(' River','')} is ${c.flow.toLowerCase()} and ${c.water}. ${report(river)}`);
+  { const nm = river.name.replace(' River',''); G.cine = {t:0, dur:3.6, title:(nm.startsWith('Hanford') ? '' : 'THE ') + nm.toUpperCase(), sub:`${fmtTime()} · ${c.flow} · ${c.water} water`}; }
+  say('River', `${weekLabel()}, ${fmtTime()}. The ${river.name.replace(' River','')} is ${c.flow.toLowerCase()} and ${c.water}. ${report(river)}`);
   if (!S.license) setTimeout(() => G && say('You', 'Forgot the license... hope the warden is napping.'), 3000);
   updateLureChip(); setPhase('cruise');
   last = performance.now(); cancelAnimationFrame(raf); raf = requestAnimationFrame(loop);
@@ -1256,12 +1294,13 @@ function spawnStatic(wy){
   if (Math.random() > logP) G.objs.push({type:'rock', x, y:wy, r:rand(11,18)});
   else G.objs.push({type:'log', x, y:wy, r:12, len:rand(34,56), ang:rand(-0.6,0.6)});
 }
-function spawnHot(wy, legend){
-  const cx = rcx(wy), hw = rhw(wy);
-  const o = {type:'hot', x: cx + rand(-hw*0.5, hw*0.5), y:wy, fish:[], spook:0, camp:null, legend:!!legend};
-  if (legend){ const lg = G.river.legend; o.fish.push({sp:lg.sp, w:lg.w, hatch:lg.hatch, legend:lg.id, lname:lg.name}); }
+function spawnHot(wy, legend, stank){
+  const cx = rcx(wy), hw = rhw(wy), side = Math.random() < 0.5 ? -1 : 1;
+  const o = {type:'hot', x: stank ? cx + side*(hw - 58) : cx + rand(-hw*0.5, hw*0.5), y:wy, fish:[], spook:0, camp:null, legend:!!legend, stank:!!stank, side, refillT:6};
+  if (stank){ const n = 8 + Math.floor(Math.random()*3); for (let i = 0; i < n; i++) o.fish.push(rollFish(G.river)); }
+  else if (legend){ const lg = G.river.legend; o.fish.push({sp:lg.sp, w:lg.w, hatch:lg.hatch, legend:lg.id, lname:lg.name}); }
   else { const n = 2 + Math.floor(Math.random()*3); for (let i = 0; i < n; i++) o.fish.push(rollFish(G.river)); }
-  o.fish.forEach((f,i) => { f.a = rand(0, 6.28); f.rr = rand(8, 26); f.sp2 = rand(0.4, 1.1) * (i%2 ? 1 : -1); });
+  o.fish.forEach((f,i) => { f.a = rand(0, 6.28); f.rr = stank ? rand(10, 44) : rand(8, 26); f.sp2 = stank ? -rand(0.15, 0.4)*side : rand(0.4, 1.1) * (i%2 ? 1 : -1); });
   G.objs.push(o);
 }
 function spawnSled(){
@@ -1278,7 +1317,7 @@ function updateButtons(){
   const a = $('#bAnchor'), b = $('#bAct');
   a.classList.remove('slot'); a.disabled = false;
   a.textContent = G.anchored ? 'Pull Anchor' : '⚓ Drop Anchor';
-  if (!G.anchored && G.nearHot){ a.classList.add('slot'); a.textContent = G.nearHot.legend ? '⚓ Anchor: gold slot!' : '⚓ Anchor on slot'; }
+  if (!G.anchored && G.nearHot){ a.classList.add('slot'); a.textContent = G.nearHot.legend ? '⚓ Anchor: gold slot!' : G.nearHot.stank ? '⚓ Anchor: Stank Hole!' : '⚓ Anchor on slot'; }
   b.classList.remove('hook','wait'); b.disabled = false;
   $('#meterBox').hidden = true; $('#fightBox').hidden = true;
   const p = G.phase;
@@ -1302,6 +1341,7 @@ function toggleAnchor(){
     if (!best){ let bd = 170; for (const o of G.objs){ if (o.type !== 'hot' || !o.fish.length) continue; const d = Math.hypot(o.x - G.px, sy(o.y) - PY); if (d < bd){ bd = d; best = o; } } }
     G.anchored = true; G.hot = best; setPhase('anchored');
     if (G.hot && G.hot.legend){ say('River', `This is it. ${G.river.legend.name} is holding in this slot. Don't blow it.`); sfx('legend'); }
+    else if (G.hot && G.hot.stank) say('River', `Anchored in the Stank Hole. Slow water, ${G.hot.fish.length} fish stacked like cordwood. It smells like old eggs and money.`);
     else say('River', G.hot ? `Anchored on a slot with ${G.hot.fish.length} fish holding. Cast with ${curLure().color}.` : 'Anchored in open water. Slots with ripples fish much better.');
   }
 }
@@ -1345,6 +1385,7 @@ function biteRate(){
   const h = G.hot && G.hot.fish.length ? G.hot : null;
   rate *= h ? 1 : 0.4;
   if (h && h.legend) rate *= 0.75;
+  if (h && h.stank) rate *= 1.8;
   rate *= l.water.includes(G.cond.water) ? 1.5 : 0.8;
   rate *= G.castQ * G.cond.mult;
   if (G.rick) rate *= 0.7;
@@ -1511,7 +1552,7 @@ function wardenCheck(spotted){
 function endTrip(reason, tow=0){
   if (!G || G.over) return;
   G.over = true; cancelAnimationFrame(raf); $('#sheet').hidden = true;
-  const g = G, r = g.river, dateStr = weekLabel().replace('Week of ','');
+  const g = G, r = g.river, nowTs = Date.now(), dateStr = tripStamp(nowTs);
   const legal = g.cooler.filter(c => !c.bad), illegal = g.cooler.filter(c => c.bad);
   const keptPts = legal.reduce((s,c)=>s+c.pts,0);
   const pts = keptPts + g.relPts + g.bonus;
@@ -1522,9 +1563,8 @@ function endTrip(reason, tow=0){
   cash -= repay; S.debt = +(S.debt - repay).toFixed(2);
   const before = rankOf(S.points);
   S.points += pts; S.cash = +(Math.max(0, S.cash + cash)).toFixed(2); S.trips++;
-  S.log.push({river:r.name, pts, date:dateStr}); if (S.log.length > 30) S.log.shift();
-  S.week++; genContracts(); save();
-  G = null;
+  S.log.push({river:r.name, pts, date:dateStr, ts:nowTs}); if (S.log.length > 30) S.log.shift();
+  G = null; syncDay(); if (S.cweek !== S.week) genContracts(); save();
   const after = rankOf(S.points);
   const unlocked = RIVERS.filter(x => x.need > S.points - pts && x.need <= S.points);
   const fishRows = g.cooler.map(c => `<span>${SPECIES[c.sp].name} · ${c.w} lb</span><span class="v ${c.bad?'warn':''}">${c.bad?'DQ':'+'+c.pts}</span>`).join('');
@@ -1552,8 +1592,8 @@ function endTrip(reason, tow=0){
     ${illegal.length?`<div class="board" style="margin-top:12px"><b>Club president:</b> Those ${illegal.length} illegal fish don't count. We have a reputation, you know.</div>`:''}
     ${g.stolen?`<div class="board" style="margin-top:12px"><b>Old-timer at the scale:</b> Sea lions got ${g.stolen} of yours? Welcome to tidewater fishing. Land them faster next time.</div>`:''}
     ${after[0]!==before[0]?`<div class="board" style="margin-top:12px"><b>Rank up!</b> You're now a ${after[0]}.${unlocked.length?` ${unlocked.map(u=>u.name).join(', ')} unlocked.`:''}</div>`:''}
-    <p class="muted">A week passes. It's now the ${weekLabel().toLowerCase()}. New jobs are on the club board.</p>
-    <div class="row" style="margin-top:8px"><button class="btn pri grow" id="sumTown">Back to Silt Creek</button></div>`;
+    <p class="muted">Logged ${dateStr}. Club jobs and the Corner Stop shift reset at midnight.</p>
+    <div class="row" style="margin-top:8px"><button class="btn pri grow" id="sumTown">Back to Silty Creek</button></div>`;
   show('scSum');
   $('#sumTown').onclick = () => { renderTown(); show('scTown'); };
 }
@@ -1571,7 +1611,8 @@ function update(dt){
   G.splashes.forEach(s => s.t -= dt); G.splashes = G.splashes.filter(s => s.t > 0);
   if (G.cine){ G.cine.t += dt; if (G.cine.t >= G.cine.dur) G.cine = null; }
   const prog = (G.clock - 360)/(G.end - 360);
-  if (G.clock >= G.end && G.phase !== 'fight'){ endTrip('Sundown. Time to load the sled.'); return; }
+  if (!G.timeWarned && G.end - G.clock <= 120){ G.timeWarned = true; say('River', 'About 30 seconds left on this trip. Make it count.'); }
+  if (G.clock >= G.end && G.phase !== 'fight'){ endTrip('Trip time is up. Time to load the sled.'); return; }
 
   const target = G.anchored ? 0 : (S.gas > 0 ? (G.nearHot ? 70 : 140) : 0);
   G.speed += (target - G.speed) * Math.min(1, dt*2.5);
@@ -1591,7 +1632,9 @@ function update(dt){
   while (G.nextSpawn < G.worldY + PY + 80){ spawnStatic(G.nextSpawn); G.nextSpawn += rand(110, 230); }
   while (G.nextHot < G.worldY + PY + 80){
     const isLegend = G.legendAt != null && G.nextHot >= G.legendAt;
-    spawnHot(G.nextHot, isLegend);
+    const isStank = !isLegend && G.stankAt != null && G.nextHot >= G.stankAt;
+    spawnHot(G.nextHot, isLegend, isStank);
+    if (isStank){ G.stankAt = null; say('River', 'Up ahead on the inside bend: the Stank Hole. Slow back eddy, stacked with fish. Smells like it, too.'); }
     if (isLegend){ G.legendAt = null; say('River','A gold glow in the next slot... something huge is holding there.'); }
     G.nextHot += rand(380, 620);
   }
@@ -1630,6 +1673,7 @@ function update(dt){
     } else if (o.type === 'hot'){
       o.spook = Math.max(0, o.spook - dt);
       o.fish.forEach(f => f.a += f.sp2*dt);
+      if (o.stank && o.fish.length < 6 && (o.refillT -= dt) <= 0){ o.refillT = rand(5, 9); const nf = rollFish(G.river); nf.a = rand(0, 6.28); nf.rr = rand(10, 44); nf.sp2 = -rand(0.15, 0.4)*o.side; o.fish.push(nf); }
       if (Math.abs(oy - PY) < 95 && Math.abs(o.x - G.px) < 90 && o.fish.length) G.nearHot = o;
     } else if (!G.anchored){
       if (o.type === 'rock' && Math.hypot(o.x - G.px, oy - PY) < o.r + 12){ damage('Clipped a rock! The hull groans.'); if (!G) return; }
@@ -1766,7 +1810,7 @@ function updateFight(dt){
 
 function fmtClock(m){ let h = Math.floor(m/60), mm = Math.floor(m%60); const ap = h >= 12 ? 'p' : 'a'; h = h % 12 || 12; return `${h}:${String(mm).padStart(2,'0')}${ap}`; }
 function updateHud(){
-  $('#hTime').textContent = fmtClock(Math.min(G.clock, G.end));
+  { const d = new Date(); $('#hTime').textContent = fmtClock(d.getHours()*60 + d.getMinutes()); }
   $('#hGas').textContent = S.gas.toFixed(1);
   $('#hHull').textContent = '●'.repeat(Math.max(0,G.hull)) + '○'.repeat(3 - Math.max(0,G.hull));
   $('#hCool').textContent = `${G.cooler.length}/${G.river.limit}`;
@@ -2095,7 +2139,33 @@ function fishShape(x, y, len, ang, wag, fill, alpha=1){
   c.beginPath(); c.moveTo(0,0); c.lineTo(-len*0.22, -len*0.14); c.lineTo(-len*0.16, 0); c.lineTo(-len*0.22, len*0.14); c.closePath(); c.fill();
   c.restore();
 }
+function drawStank(o, y){
+  const c = ctx, sd = o.side, t = G.t;
+  c.save();
+  /* slow, dark back-eddy pool hugging the bank */
+  const g = c.createRadialGradient(o.x, y, 6, o.x, y, 80); g.addColorStop(0, 'rgba(20,30,14,.62)'); g.addColorStop(0.65, 'rgba(32,44,22,.38)'); g.addColorStop(1, 'rgba(32,44,22,0)');
+  c.fillStyle = g; c.beginPath(); c.ellipse(o.x + sd*8, y, 80, 58, 0, 0, 7); c.fill();
+  /* seam line where the main current meets the eddy */
+  c.strokeStyle = 'rgba(235,240,220,.35)'; c.lineWidth = 1.6; c.setLineDash([5,6]); c.lineDashOffset = t*28;
+  c.beginPath(); c.moveTo(o.x - sd*62, y - 70); c.quadraticCurveTo(o.x - sd*78, y, o.x - sd*58, y + 66); c.stroke(); c.setLineDash([]);
+  /* slow swirl arcs turning against the current */
+  for (let k = 0; k < 4; k++){ const r = 16 + k*13, a0 = -t*0.35*sd + k*1.7; c.strokeStyle = `rgba(225,232,205,${0.32 - k*0.05})`; c.lineWidth = 1.4;
+    c.beginPath(); c.ellipse(o.x, y, r, r*0.7, 0, a0, a0 + 2.2); c.stroke(); }
+  /* foam scum drifting around the eddy */
+  for (let i = 0; i < 16; i++){ const a = -t*0.3*sd + i*0.39, rr = 22 + (i*13 % 40); c.fillStyle = `rgba(240,236,214,${0.45 + 0.25*Math.sin(t + i)})`; c.beginPath(); c.arc(o.x + Math.cos(a)*rr, y + Math.sin(a)*rr*0.7, 1.4 + (i % 3)*0.7, 0, 7); c.fill(); }
+  /* stink lines */
+  c.strokeStyle = 'rgba(150,190,80,.55)'; c.lineWidth = 1.8;
+  for (let k = 0; k < 3; k++){ const sx = o.x - 18 + k*18, ph = (t*0.6 + k*0.33) % 1, yy = y - 46 - ph*26; c.globalAlpha = 1 - ph;
+    c.beginPath(); c.moveTo(sx, yy + 14); c.bezierCurveTo(sx - 6, yy + 9, sx + 6, yy + 5, sx, yy); c.stroke(); }
+  c.globalAlpha = 1;
+  /* sign label */
+  c.font = '700 11px "Barlow Semi Condensed", sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle';
+  const lw = c.measureText('STANK HOLE').width + 14; c.fillStyle = 'rgba(40,52,22,.85)'; c.beginPath(); if (c.roundRect) c.roundRect(o.x - lw/2, y - 86, lw, 18, 9); else c.rect(o.x - lw/2, y - 86, lw, 18); c.fill();
+  c.fillStyle = '#d6f07a'; c.fillText('STANK HOLE', o.x, y - 77); c.textAlign = 'left'; c.textBaseline = 'alphabetic';
+  c.restore();
+}
 function drawSlot(o, y){
+  if (o.stank) drawStank(o, y);
   const c = ctx, near = o === G.nearHot || o === G.hot;
   const g = c.createRadialGradient(o.x, y, 4, o.x, y, 54); g.addColorStop(0, o.legend ? 'rgba(80,60,10,.35)' : 'rgba(4,22,28,.4)'); g.addColorStop(1, 'rgba(4,22,28,0)');
   c.fillStyle = g; c.beginPath(); c.ellipse(o.x, y, 56, 36, 0, 0, 7); c.fill();
@@ -2310,20 +2380,22 @@ function draw(){
   for (const b of G.bubbles){ if (!G.objs.includes(b.obj)) continue; const by = sy(b.obj.y); if (by < -20 || by > h + 20) continue; drawBubble(b.obj.x, by, b.text, b.obj.type === 'rick' ? '#a64dff' : b.obj.type === 'pinn' ? '#8a6a45' : '#ff5d50'); }
   c.restore();
   /* cinematic grade: warm toward the sun, teal in the shadows */
-  const prog = clamp((G.clock - 360)/(G.end - 360), 0, 1);
+  const RL = townLight(), rd = new Date(), rhr = TS.forceHr != null ? TS.forceHr : rd.getHours() + rd.getMinutes()/60;
+  const prog = clamp((rhr - 6)/13, 0, 1);
   const sunX = w*(-0.15 + 1.3*prog), sunY = -h*0.2;
   const warm = prog < 0.22 ? 1 - prog/0.22 : prog > 0.62 ? Math.min(1, (prog - 0.62)/0.3) : 0;
   const sunRGB = prog > 0.5 ? '255,110,60' : '255,160,85';
   c.save();
   c.globalCompositeOperation = 'soft-light';
   const gg = c.createRadialGradient(sunX, sunY, 10, sunX, sunY, Math.hypot(w, h)*1.15);
-  gg.addColorStop(0, `rgba(${sunRGB},${0.45 + 0.4*warm})`); gg.addColorStop(0.55, `rgba(${sunRGB},${0.08 + 0.12*warm})`); gg.addColorStop(1, `rgba(0,70,95,${G.cond.rain ? 0.35 : 0.55})`);
+  const day = 1 - RL.dark*0.85; gg.addColorStop(0, `rgba(${sunRGB},${(0.45 + 0.4*warm)*day})`); gg.addColorStop(0.55, `rgba(${sunRGB},${(0.08 + 0.12*warm)*day})`); gg.addColorStop(1, `rgba(0,70,95,${G.cond.rain ? 0.35 : 0.55})`);
   c.fillStyle = gg; c.fillRect(0, 0, w, h);
   c.globalCompositeOperation = 'screen';
   const hz = c.createRadialGradient(sunX, sunY, 0, sunX, sunY, h*0.95);
-  hz.addColorStop(0, `rgba(${sunRGB},${(G.cond.rain ? 0.08 : 0.22)*(0.45 + warm)})`); hz.addColorStop(1, `rgba(${sunRGB},0)`);
+  hz.addColorStop(0, `rgba(${sunRGB},${(G.cond.rain ? 0.08 : 0.22)*(0.45 + warm)*day})`); hz.addColorStop(1, `rgba(${sunRGB},0)`);
   c.fillStyle = hz; c.fillRect(0, 0, w, h);
-  if (prog > 0.8){ c.globalCompositeOperation = 'multiply'; c.fillStyle = `rgba(${Math.round(255 - 170*(prog - 0.8)*5)},${Math.round(255 - 200*(prog - 0.8)*5)},${Math.round(255 - 110*(prog - 0.8)*5)},1)`; c.fillRect(0, 0, w, h); }
+  if (RL.dark > 0 || RL.dusk > 0){ c.globalCompositeOperation = 'multiply'; const k = RL.dark*0.62; c.fillStyle = `rgb(${Math.round(255 - 150*k - 10*RL.dusk)},${Math.round(255 - 140*k - 50*RL.dusk)},${Math.round(255 - 80*k - 70*RL.dusk)})`; c.fillRect(0, 0, w, h); }
+  if (false){ c.globalCompositeOperation = 'multiply'; c.fillStyle = `rgba(${Math.round(255 - 170*(prog - 0.8)*5)},${Math.round(255 - 200*(prog - 0.8)*5)},${Math.round(255 - 110*(prog - 0.8)*5)},1)`; c.fillRect(0, 0, w, h); }
   c.restore();
   if (G.cond.rain){ c.fillStyle = 'rgba(70,85,95,.16)'; c.fillRect(0,0,w,h); c.strokeStyle = 'rgba(220,235,240,.22)'; c.lineWidth = 1; for (let i = 0; i < 45; i++){ const x = (i*97 + G.t*40) % w, y = (i*61 + G.t*480) % h; c.beginPath(); c.moveTo(x, y); c.lineTo(x - 3, y + 11); c.stroke(); } }
   /* bloom on bright things */
@@ -2333,6 +2405,7 @@ function draw(){
     for (let i = 0; i < 40; i++){ const yy = ((i*71 + G.t*(flowSpd2 + G.speed)) % (h + 20)), wy = G.worldY + (PY - yy), x = rcx(wy) + (srand(i*3.3)*2-1)*rhw(wy)*0.9, a2 = Math.max(0, Math.sin(G.t*4 + i*1.7)); if (i % 3 === 0 && a2 > 0.7) glowAt(c, FX.tint.warm, x + 1, yy, 3 + a2*3, (a2 - 0.65)*1.4); }
   }
   for (const q of G.wake){ glowAt(c, FX.tint.white, q.x, sy(q.y), 4 + (1.2 - q.t)*5, q.t*0.08); }
+  if (RL.dark > 0.2){ glowAt(c, FX.tint.warm, G.px, PY - 70, 60, 0.32*RL.dark); glowAt(c, FX.tint.white, G.px, PY - 26, 10, 0.5*RL.dark); glowAt(c, FX.tint.red, G.px - 10, PY + 20, 5, 0.6*RL.dark); }
   if (!G.anchored && G.speed > 30) glowAt(c, FX.tint.white, G.px, PY + 28, 14, 0.1);
   if (G.phase === 'retrieve' || G.phase === 'nibble'){ const [lx, ly] = fishPos(); glowAt(c, FX.tint.warm, lx, ly, 12, 0.5 + 0.3*Math.sin(G.t*9)); }
   for (const o of G.objs){ if (o.type === 'hot' && o.legend){ const yy = sy(o.y); if (yy > -60 && yy < h + 60) glowAt(c, FX.tint.gold, o.x, yy, 70, 0.28 + 0.1*Math.sin(G.t*3)); } }
@@ -2400,8 +2473,8 @@ let TW = 360, TH = 300;
 const TOWN_W = 1900;
 const PLACES = [
   {id:'cabin',  name:'Your Cabin',            x:110,  w:250, door:250},
-  {id:'tackle', name:'Silt Creek Tackle',     x:440,  w:270, door:600},
-  {id:'store',  name:'Corner Stop & Fuel',    x:800,  w:390, door:1100},
+  {id:'tackle', name:'Silty Creek Tackle',     x:440,  w:270, door:600},
+  {id:'store',  name:'Mikey\'s Corner Stop and Fuel', short:'Mikey\'s',    x:800,  w:390, door:1100},
   {id:'club',   name:'Silty Spoon Drift Club', x:1260, w:320, door:1440},
   {id:'launch', name:'Boat Launch',           x:1640, w:250, door:1740},
 ];
@@ -2414,7 +2487,7 @@ function enterPlace(p){
   sfx('tick'); TS.tx = null; TS.goal = null; TS.hold = 0; TS.key = 0;
   if (p.id === 'cabin') openCabin();
   if (p.id === 'tackle') openShop(false);
-  if (p.id === 'store') openStore();
+  if (p.id === 'store') enterStore();
   if (p.id === 'club') openClub();
   if (p.id === 'launch'){ renderMap(); show('scMap'); }
 }
@@ -2451,7 +2524,7 @@ function townUpdate(dt){
   }
   if (dir){ TS.x = clamp(TS.x + dir*175*dt, 30, TOWN_W - 30); TS.face = dir; TS.step += dt*10; } else TS.step = 0;
   TS.cam = clamp(TS.x - TW/2, 0, TOWN_W - TW);
-  const p = nearPlace(), btn = $('#wEnter'), label = p ? `Enter ${p.name}` : 'Walk to a door';
+  const p = nearPlace(), btn = $('#wEnter'), label = p ? `Enter ${p.short || p.name}` : 'Walk to a door';
   if (btn.textContent !== label) btn.textContent = label;
   btn.disabled = !p;
   if (TS.bub){ TS.bub.t -= dt; if (TS.bub.t <= 0) TS.bub = null; }
@@ -2561,7 +2634,7 @@ function drawBuilding(c, p, base, u){
     c.fillStyle = '#4e321c'; c.fillRect(x0 - 6, base - H - 40*u, p.w + 12, 44*u);
     c.fillStyle = '#ede1bf'; c.fillRect(x0 + 10, base - H - 34*u, p.w - 20, 28*u);
     c.strokeStyle = '#2f1d0f'; c.lineWidth = 2; c.strokeRect(x0 + 10, base - H - 34*u, p.w - 20, 28*u);
-    signText(c, 'SILT CREEK TACKLE', (x0 + x1)/2, base - H - 20*u, Math.min(17*u, (p.w - 30)/10.5), '#b54a12');
+    signText(c, 'SILTY CREEK TACKLE', (x0 + x1)/2, base - H - 20*u, Math.min(17*u, (p.w - 30)/11.2), '#b54a12');
     const fx = x1 - 30, fy = base - H - 56*u;
     c.save(); c.translate(fx, fy); c.rotate(-0.12 + Math.sin(TS.t*1.2)*0.03);
     c.strokeStyle = '#333'; c.lineWidth = 1; c.beginPath(); c.moveTo(-14, -14); c.lineTo(-14, 16); c.moveTo(14, -14); c.lineTo(14, 16); c.stroke();
@@ -2599,9 +2672,11 @@ function drawBuilding(c, p, base, u){
     const sx0 = x0 + 190, H = 92*u;
     c.fillStyle = tGrad(c, sx0, 0, x1, 0, [[0,'#cdb88c'],[1,'#b29d72']]); c.fillRect(sx0, base - H, x1 - sx0, H);
     c.strokeStyle = 'rgba(80,60,30,.2)'; c.lineWidth = 1; for (let yy = base - H + 6; yy < base; yy += 6*u){ c.beginPath(); c.moveTo(sx0, yy); c.lineTo(x1, yy); c.stroke(); }
-    c.fillStyle = '#7d6c4c'; c.fillRect(sx0 - 4, base - H - 26*u, x1 - sx0 + 8, 28*u);
-    c.fillStyle = '#c23b2e'; c.fillRect(sx0 + 6, base - H - 22*u, x1 - sx0 - 12, 20*u);
-    signText(c, 'CORNER STOP & FUEL', (sx0 + x1)/2, base - H - 12*u, Math.min(12*u, (x1 - sx0 - 20)/12), '#fff8e8');
+    c.fillStyle = '#7d6c4c'; c.fillRect(sx0 - 4, base - H - 44*u, x1 - sx0 + 8, 46*u);
+    c.fillStyle = '#c23b2e'; c.fillRect(sx0 + 6, base - H - 40*u, x1 - sx0 - 12, 38*u);
+    c.save(); c.fillStyle = '#ffd84a'; c.font = `italic 700 ${Math.min(17*u, (x1 - sx0 - 20)/4.6)}px Georgia, "Times New Roman", serif`; c.textAlign = 'center'; c.textBaseline = 'middle';
+    c.shadowColor = 'rgba(60,10,5,.55)'; c.shadowOffsetY = 1.5; c.fillText("Mikey's", (sx0 + x1)/2, base - H - 29*u); c.restore();
+    signText(c, 'CORNER STOP AND FUEL', (sx0 + x1)/2, base - H - 11*u, Math.min(10*u, (x1 - sx0 - 20)/13.5), '#fff8e8');
     windowPane(c, sx0 + 12, base - 72*u, p.door - sx0 - 38, 50*u, false);
     c.fillStyle = '#e8d24a'; c.fillRect(sx0 + 20, base - 66*u, 22, 28*u); c.fillStyle = '#3a8fd0'; c.fillRect(sx0 + 46, base - 64*u, 18, 24*u);
     c.save(); c.shadowColor = '#ff3b3b'; c.shadowBlur = 10 + Math.sin(TS.t*6)*3; signText(c, 'OPEN', sx0 + 50, base - 32*u, 10*u, '#ff6a5a', '"Overpass Mono", monospace'); c.restore();
@@ -2770,7 +2845,7 @@ function townDraw(){
     const neon = (x, y, ww, hh, col, spr) => { const sx = x - cam; if (sx + ww < -40 || sx > w + 40) return; c.globalCompositeOperation = 'source-over'; c.shadowColor = col; c.shadowBlur = 14; c.strokeStyle = col; c.lineWidth = 2.4; c.globalAlpha = 0.6 + 0.4*L; c.strokeRect(sx, y, ww, hh); c.shadowBlur = 0; c.globalAlpha = 1; c.globalCompositeOperation = 'lighter'; glowAt(c, spr, sx + ww/2, y + hh/2, Math.max(ww, hh)*0.7, 0.35*L); };
     const P = Object.fromEntries(PLACES.map(q => [q.id, q]));
     { const q = P.tackle, H = 108*u; neon(q.x + 10, base - H - 34*u, q.w - 20, 28*u, '#ff8a2a', FX.tint.orange); neon(q.door - 10, base - 42*u, 20, 9*u, '#ff3b3b', FX.tint.red); }
-    { const q = P.store, sx0 = q.x + 190; neon(sx0 + 6, base - 92*u - 22*u, q.x + q.w - sx0 - 12, 20*u, '#ff4a4a', FX.tint.red); neon(q.x + 170 - 54, base - 176*u, 54, 30*u, '#ff5d50', FX.tint.red); }
+    { const q = P.store, sx0 = q.x + 190; neon(sx0 + 6, base - 92*u - 40*u, q.x + q.w - sx0 - 12, 38*u, '#ff4a4a', FX.tint.red); neon(q.x + 170 - 54, base - 176*u, 54, 30*u, '#ff5d50', FX.tint.red); }
     { const q = P.club, H = 100*u; neon(q.x + 30, base - H - 40*u, q.w - 60, 30*u, '#8ff0c0', FX.tint.mint); }
     { const q = P.launch; neon(q.x, base - 96*u, 110, 32*u, '#8ff0c0', FX.tint.mint); }
     /* wet road reflections */
@@ -2786,7 +2861,7 @@ function townDraw(){
   if (TS.rick.bub && !TS.bub) townBubble(c, TS.rick.x - cam, base - 72*u, 'Rowdy Rick: ' + TS.rick.bub.text);
   if (TS.bub) townBubble(c, TS.bub.x - cam, TS.bub.y, TS.bub.text);
   if (rain){ c.fillStyle = 'rgba(60,70,80,.12)'; c.fillRect(0, 0, w, h); c.strokeStyle = 'rgba(220,232,240,.4)'; c.lineWidth = 1; for (let i = 0; i < 60; i++){ const x = (i*67 + TS.t*60) % w, y = (i*41 + TS.t*520) % h; c.beginPath(); c.moveTo(x, y); c.lineTo(x - 3, y + 10); c.stroke(); } }
-  c.font = '700 12px "Barlow Semi Condensed", sans-serif'; const lbl = weekLabel() + (rain ? ' · rain' : ''), lw = c.measureText(lbl).width + 16; c.fillStyle = 'rgba(12,34,32,.78)'; c.beginPath(); if (c.roundRect) c.roundRect(8, 8, lw, 22, 11); else c.rect(8, 8, lw, 22); c.fill(); c.fillStyle = '#eef2e6'; c.fillText(lbl, 16, 23);
+  c.font = '700 12px "Barlow Semi Condensed", sans-serif'; const lbl = weekLabel() + ' · ' + fmtTime() + (rain ? ' · rain' : ''), lw = c.measureText(lbl).width + 16; c.fillStyle = 'rgba(12,34,32,.78)'; c.beginPath(); if (c.roundRect) c.roundRect(8, 8, lw, 22, 11); else c.rect(8, 8, lw, 22); c.fill(); c.fillStyle = '#eef2e6'; c.fillText(lbl, 16, 23);
 }
 
 /* ---- town input ---- */
@@ -2804,7 +2879,7 @@ tv.addEventListener('pointerdown', e => {
   } }
   if (TS.sq && !TS.sq.spotted && Math.abs(wx - TS.sq.x) < 26 && y > base - 92*u && y < base + 6*u && !PLACES.some(q => wx >= q.x && wx <= q.x + q.w)){
     TS.sq.spotted = true; S.squatch = (S.squatch||0) + 1; sfx('legend');
-    let msg = 'Another blurry Sasquatch photo! The club only buys one a week.';
+    let msg = 'Another blurry Sasquatch photo! The club only buys one a day.';
     if (S.squatchTownWeek !== S.week){ S.squatchTownWeek = S.week; S.cash = +(S.cash + 10).toFixed(2); msg = 'SASQUATCH! Blurry photo. The club pays $10 for it.'; }
     save(); renderTown(); TS.bub = {x: TS.sq.x, y: base - 96*u, text: msg, t: 3.2}; return;
   }
@@ -2831,8 +2906,8 @@ $('#mapBack').onclick = () => { TS.x = PLACES[4].door; renderTown(); show('scTow
 renderTown(); show('scTown');
 if (!S.seenIntro){
   S.seenIntro = true; save();
-  openSheet(head('Welcome to Silt Creek','Fall run season is on') + `<div class="logoplate"><img src="${LOGO_SRC}" alt="The Silty Spoon, Stocklin Lures"></div>
-    <p style="margin:0">It's early September. You've got <b>$60</b>, <b>12 gallons</b> and two <b>Silty Spoon Minnow Chrome UV</b> spoons. Tap a building to walk over and go in. Grab a license at the Corner Stop before the warden finds you, and maybe a Radioactive spoon at the Tackle shop, since the Nooksack runs silty. Your truck and sled are at the Boat Launch at the end of the street.</p>
+  openSheet(head('Welcome to Silty Creek','The river is calling') + `<div class="logoplate"><img src="${LOGO_SRC}" alt="The Silty Spoon, Stocklin Lures"></div>
+    <p style="margin:0">It's ${weekLabel()}, and the game runs on your real clock. You've got <b>$60</b>, <b>12 gallons</b> and two <b>Silty Spoon Minnow Chrome UV</b> spoons. Tap a building to walk over and go in. Grab a license at the Corner Stop before the warden finds you, and maybe a Radioactive spoon at Silty Creek Tackle, since the Nooksack runs silty. Your truck and sled are at the Boat Launch at the end of the street.</p>
     <div class="board"><b>Heads up:</b> Angry sled guys own every drift. The game warden hides in the bushes, even in town. Seals and sea lions will eat your fish right off the line on tidewater rivers. And if a purple sled with a phone on a stick pulls up, that's Rowdy Rick. He has thoughts about WDFW.</div>
     <div class="row"><button class="btn grow" id="iHelp">How to play</button><button class="btn pri grow" id="iGo">Let's go</button></div>`);
   $('#iGo').onclick = closeSheet; $('#iHelp').onclick = () => { closeSheet(); openHelp(); };

@@ -413,6 +413,17 @@ const rankOf = p => { let r = RANKS[0]; for (const k of RANKS) if (p >= k[1]) r 
 const nextRank = p => RANKS.find(k => k[1] > p);
 
 const SLED_LINES = ["THAT'S MY DRIFT, BUDDY!","Get outta my backtroll lane!","Been fishin' this hole since '82!","Learn to drive that thing!","Wake? What wake?","Hey! HEY! Move it!","You're parked on my fish!","Nice anchor job, genius."];
+const BANKIES = [
+  {name:'Mike', jacket:'#a8352c', jacket2:'#6d1f1a', plaid:true, hat:'beanie', hatCol:'#222', beard:'#4a2e18', skin:'#e2b48c',
+   lines:["MICHAEL! Get that sled outta my drift!","I was here at 4 a.m., buddy!","That's a BANK hole!","Nice spoon. Now MOVE."]},
+  {name:'Eli', jacket:'#3f6b3a', jacket2:'#24421f', hat:'cap', hatCol:'#6b6a3e', beard:null, skin:'#d9a57c',
+   lines:["Hey! Go fish the Stank Hole!","You're running right over my fish!","Swing WIDE, sled boy!","Stocklin! Show some respect for the bank!"]},
+  {name:'Peter', jacket:'#2f5d8f', jacket2:'#1c3a5c', hat:'bucket', hatCol:'#b49a6a', beard:'#7a5a3a', skin:'#efc29c', glasses:true,
+   lines:["You're sitting on my float!","I can SEE your spoon from here!","Wake 'em up, why don'tcha!","Fish don't like motors, Michael!"]},
+  {name:'Aaron', jacket:'#e46d1e', jacket2:'#a84a0e', hat:'backcap', hatCol:'#1d2a3a', beard:'#3a2412', skin:'#c48a5e', goatee:true,
+   lines:["Get offa my hole!","Ever heard of a no-wake zone?!","I've been on this rock since Tuesday!","Real anglers fish from the BANK!"]},
+];
+const BANKIE_THANKS = ["Thanks for swinging wide!","Respect! Good spoons, too.","Appreciate the room, Michael!","Now THAT'S river manners."];
 const SLED_NAMES = ['Big Gary','Hollerin\' Hank','Dwayne','Two-Rod Terry','Sled Dad','Uncle Rocco'];
 const SLED_COLORS = ['#c9ced1','#3a6fb0','#b8342b','#2f7a49','#d9a33a','#4a4f55'];
 const RICK_LINES = [
@@ -1266,7 +1277,7 @@ function startTrip(river){
   const legendOn = !S.legends[lg.id] && lg.mo.includes(curMonth()) && c.flow !== 'Blown out' && Math.random() < 0.45;
   G = {river, cond:c, t:0, worldY:0, px:CW/2, targetX:null, keyX:0, speed:0, anchored:false, hull:3, hitCD:0,
     clock:360, end:Math.round(360 + 660*(1 + WADER().time)), objs:[], nextSpawn:260, nextHot:360, sledT:rand(2,4), pinnT: river.pinn ? rand(3,8) : 1e9,
-    legendAt: legendOn ? rand(1400, 3200) : null, stankAt: rand(650, 1500),
+    legendAt: legendOn ? rand(1400, 3200) : null, stankAt: rand(650, 1500), bankT: rand(6, 12), bankQ: BANKIES.slice().sort(() => Math.random() - 0.5),
     cooler:[], relPts:0, bonus:0, bonusCash:0, clout:0, fines:0, stolen:0, jobsDone:[], legendCaught:null, harassed:false, harassFined:false, chased:false,
     phase:'cruise', holding:false, castT:0, castQ:1, lureDist:0, f:null, hot:null, spook:0, nib:0, nibT:0, biteT:0, pendingFish:null,
     wardenAt:rand(0.2,0.7), wardenDone:Math.random()<0.15, squatchAt: Math.random() < 0.55 ? rand(0.08, 0.9) : null, squatch:null, squatchSeen:false, photoCash:0, rickAt:[rand(0.1,0.45), rand(0.55,0.85)].filter(()=>Math.random()<0.7),
@@ -1303,6 +1314,18 @@ function spawnHot(wy, legend, stank){
   o.fish.forEach((f,i) => { f.a = rand(0, 6.28); f.rr = stank ? rand(10, 44) : rand(8, 26); f.sp2 = stank ? -rand(0.15, 0.4)*side : rand(0.4, 1.1) * (i%2 ? 1 : -1); });
   G.objs.push(o);
 }
+function spawnBankie(){
+  if (!G.bankQ.length) return;
+  const b = G.bankQ.shift(), wy = G.worldY + PY + 120, cx = rcx(wy), hw = rhw(wy), side = Math.random() < 0.5 ? -1 : 1;
+  const hole = {type:'hot', x: cx + side*(hw - 50), y: wy + 6, fish:[], spook:0, camp:null, legend:false, bankie:b.name, side};
+  const n = 3 + Math.floor(Math.random()*3); for (let i = 0; i < n; i++){ const f = rollFish(G.river); f.a = rand(0, 6.28); f.rr = rand(8, 26); f.sp2 = rand(0.4, 1.1)*(i%2 ? 1 : -1); hole.fish.push(f); }
+  G.objs.push(hole);
+  G.objs.push({type:'bankie', b, x: clamp(cx + side*(hw + 16), 30, CW - 30), y: wy, side, hole, passed:false, yell:0, yellCD:0, mood:'fishing'});
+}
+function bankieYell(o, angry){
+  const line = angry ? pick(o.b.lines) : pick(BANKIE_THANKS);
+  o.yell = 2.6; o.mood = angry ? 'mad' : 'happy'; bubble(o, line); say(o.b.name + ' (bankie)', '"' + line + '"');
+}
 function spawnSled(){
   const wy = G.worldY + PY + 60, cx = rcx(wy), hw = rhw(wy);
   G.objs.push({type:'sled', x: cx + rand(-hw*0.6, hw*0.6), y: wy, vy: -rand(150,230), vx: rand(-40,40), col: pick(SLED_COLORS), name: pick(SLED_NAMES), said:false, waked:false});
@@ -1317,7 +1340,7 @@ function updateButtons(){
   const a = $('#bAnchor'), b = $('#bAct');
   a.classList.remove('slot'); a.disabled = false;
   a.textContent = G.anchored ? 'Pull Anchor' : '⚓ Drop Anchor';
-  if (!G.anchored && G.nearHot){ a.classList.add('slot'); a.textContent = G.nearHot.legend ? '⚓ Anchor: gold slot!' : G.nearHot.stank ? '⚓ Anchor: Stank Hole!' : '⚓ Anchor on slot'; }
+  if (!G.anchored && G.nearHot){ a.classList.add('slot'); a.textContent = G.nearHot.legend ? '⚓ Anchor: gold slot!' : G.nearHot.stank ? '⚓ Anchor: Stank Hole!' : G.nearHot.bankie ? `⚓ Anchor: ${G.nearHot.bankie}'s hole` : '⚓ Anchor on slot'; }
   b.classList.remove('hook','wait'); b.disabled = false;
   $('#meterBox').hidden = true; $('#fightBox').hidden = true;
   const p = G.phase;
@@ -1341,6 +1364,7 @@ function toggleAnchor(){
     if (!best){ let bd = 170; for (const o of G.objs){ if (o.type !== 'hot' || !o.fish.length) continue; const d = Math.hypot(o.x - G.px, sy(o.y) - PY); if (d < bd){ bd = d; best = o; } } }
     G.anchored = true; G.hot = best; setPhase('anchored');
     if (G.hot && G.hot.legend){ say('River', `This is it. ${G.river.legend.name} is holding in this slot. Don't blow it.`); sfx('legend'); }
+    else if (G.hot && G.hot.bankie) say('River', `You anchored on ${G.hot.bankie}'s bank hole. He is NOT happy. Fish bite slower with him yelling.`);
     else if (G.hot && G.hot.stank) say('River', `Anchored in the Stank Hole. Slow water, ${G.hot.fish.length} fish stacked like cordwood. It smells like old eggs and money.`);
     else say('River', G.hot ? `Anchored on a slot with ${G.hot.fish.length} fish holding. Cast with ${curLure().color}.` : 'Anchored in open water. Slots with ripples fish much better.');
   }
@@ -1386,6 +1410,7 @@ function biteRate(){
   rate *= h ? 1 : 0.4;
   if (h && h.legend) rate *= 0.75;
   if (h && h.stank) rate *= 1.8;
+  if (h && h.bankie) rate *= 0.7;
   rate *= l.water.includes(G.cond.water) ? 1.5 : 0.8;
   rate *= G.castQ * G.cond.mult;
   if (G.rick) rate *= 0.7;
@@ -1638,12 +1663,24 @@ function update(dt){
     if (isLegend){ G.legendAt = null; say('River','A gold glow in the next slot... something huge is holding there.'); }
     G.nextHot += rand(380, 620);
   }
+  G.bankT -= dt; if (G.bankT <= 0){ spawnBankie(); G.bankT = rand(22, 38); }
   G.sledT -= dt; if (G.sledT <= 0){ spawnSled(); G.sledT = r.sledEvery * rand(0.6, 1.4); }
   G.pinnT -= dt; if (G.pinnT <= 0){ spawnPinn(); G.pinnT = rand(9, 16) / r.pinn.rate * (G.chased ? 3 : 1); }
 
   G.nearHot = null;
   for (const o of G.objs){
     const oy = sy(o.y);
+    if (o.type === 'bankie'){
+      o.yell = Math.max(0, o.yell - dt); o.yellCD = Math.max(0, o.yellCD - dt); if (!o.yell && o.mood !== 'fishing') o.mood = 'fishing';
+      const dy = oy - PY, dist = Math.abs(G.px - o.x);
+      if (!o.passed && !G.anchored && dy > -10 && dy < 40){
+        o.passed = true;
+        if (dist < 120 && G.speed > 60){ bankieYell(o, true); G.spook = Math.max(G.spook, 0); o.hole.spook = 6; G.bonus -= 3; }
+        else if (dist > 170){ bankieYell(o, false); G.bonus += 5; }
+      }
+      if (G.anchored && G.hot === o.hole && !o.yellCD){ bankieYell(o, true); o.yellCD = rand(6, 9); }
+      continue;
+    }
     if (o.type === 'sled'){
       o.y += o.vy*dt;
       const dy = sy(o.y) - PY;
@@ -1857,6 +1894,64 @@ function bushMass(c, cx, cy, r, back, seedv){
     c.fillStyle = srand(i*5.5 + seedv) > 0.5 ? lite : mid;
     c.beginPath(); c.ellipse(lx, ly, 3.2, 1.7, a + 0.6, 0, 7); c.fill();
   }
+}
+function drawBankie(c, o, y){
+  const b = o.b, sd = o.side, t = G.t, mad = o.mood === 'mad', happy = o.mood === 'happy';
+  const bob = mad ? Math.sin(t*14)*1.2 : 0, wave = mad ? Math.sin(t*16)*0.5 : happy ? Math.sin(t*9)*0.6 : 0;
+  /* line and float out in the water */
+  const fx = o.hole.x + Math.sin(t*0.8)*4, fy = sy(o.hole.y) + Math.cos(t*0.7)*3;
+  const K = 1.12, tipX = o.x - sd*40*K, tipY = y + 12 - 40*K;
+  c.strokeStyle = 'rgba(240,240,240,.55)'; c.lineWidth = 0.8; c.beginPath(); c.moveTo(tipX, tipY); c.quadraticCurveTo((tipX + fx)/2, Math.max(tipY, fy) + 10, fx, fy); c.stroke();
+  c.fillStyle = 'rgba(255,255,255,.35)'; c.beginPath(); c.ellipse(fx, fy + 2, 5 + Math.sin(t*2)*1.5, 2, 0, 0, 7); c.fill();
+  c.fillStyle = '#ff3a2a'; c.beginPath(); c.arc(fx, fy - 2, 2.6, Math.PI, 0); c.fill(); c.fillStyle = '#fff'; c.beginPath(); c.arc(fx, fy - 2, 2.6, 0, Math.PI); c.fill();
+  c.save(); c.translate(o.x, y + 12 + bob); c.scale(K, K);
+  /* shadow, bucket, rod holder */
+  c.fillStyle = 'rgba(0,0,0,.3)'; c.beginPath(); c.ellipse(3, 2, 24, 6, 0, 0, 7); c.fill();
+  c.fillStyle = '#e8e2d2'; c.beginPath(); c.moveTo(sd*14 - 6, -12); c.lineTo(sd*14 + 6, -12); c.lineTo(sd*14 + 5, 0); c.lineTo(sd*14 - 5, 0); c.closePath(); c.fill();
+  c.fillStyle = '#c8402e'; c.fillRect(sd*14 - 6, -9, 12, 2.5);
+  /* legs: chest waders */
+  c.fillStyle = '#4b4a3a'; c.fillRect(-7, -14, 6, 14); c.fillRect(1, -14, 6, 14);
+  c.fillStyle = '#2c2b22'; c.fillRect(-8, -3, 8, 3); c.fillRect(0, -3, 8, 3);
+  /* torso / jacket */
+  const hy = -36;
+  let g = c.createLinearGradient(-12, 0, 12, 0); g.addColorStop(0, b.jacket2); g.addColorStop(0.5, b.jacket); g.addColorStop(1, b.jacket2);
+  c.fillStyle = g; c.beginPath(); c.moveTo(-11, -12); c.lineTo(-12, hy + 14); c.quadraticCurveTo(-11, hy + 9, -5, hy + 8); c.lineTo(5, hy + 8); c.quadraticCurveTo(11, hy + 9, 12, hy + 14); c.lineTo(11, -12); c.closePath(); c.fill();
+  if (b.plaid){ c.strokeStyle = 'rgba(20,10,8,.35)'; c.lineWidth = 1; for (let k = -9; k <= 9; k += 4.5){ c.beginPath(); c.moveTo(k, hy + 9); c.lineTo(k, -12); c.stroke(); } for (let k = hy + 13; k < -12; k += 5){ c.beginPath(); c.moveTo(-11, k); c.lineTo(11, k); c.stroke(); } }
+  c.fillStyle = '#4b4a3a'; c.fillRect(-7, -20, 14, 9); /* wader bib */
+  c.fillStyle = '#2c2b22'; c.fillRect(-6, hy + 9, 1.6, 16); c.fillRect(4.4, hy + 9, 1.6, 16);
+  /* rod arm toward the water, other arm waving when yelling */
+  c.strokeStyle = b.jacket; c.lineWidth = 4.2; c.lineCap = 'round';
+  c.beginPath(); c.moveTo(-sd*9, hy + 12); c.lineTo(-sd*15, hy + 20); c.stroke();
+  c.strokeStyle = '#2a2420'; c.lineWidth = 1.6; c.beginPath(); c.moveTo(-sd*14, hy + 24); c.lineTo(-sd*40, hy - 4); c.stroke();
+  c.strokeStyle = b.jacket; c.lineWidth = 4.2; c.beginPath(); c.moveTo(sd*9, hy + 12);
+  if (mad || happy){ const ax = sd*(14 + wave*4), ay = hy - 4 + Math.abs(wave)*3; c.lineTo(ax, ay); c.stroke(); c.fillStyle = b.skin; c.beginPath(); c.arc(ax, ay - 2, 2.6, 0, 7); c.fill(); }
+  else { c.lineTo(sd*12, hy + 24); c.stroke(); }
+  c.lineCap = 'butt';
+  /* head */
+  c.fillStyle = b.skin; c.fillRect(-2.5, hy + 3, 5, 5);
+  c.beginPath(); c.ellipse(0, hy - 2, 7, 8.2, 0, 0, 7); c.fill();
+  if (b.beard){ c.fillStyle = b.beard; c.beginPath(); if (b.goatee){ c.ellipse(0, hy + 4.5, 2.6, 2.8, 0, 0, 7); } else { c.moveTo(-6.8, hy - 1); c.quadraticCurveTo(-6, hy + 7, 0, hy + 7.5); c.quadraticCurveTo(6, hy + 7, 6.8, hy - 1); c.lineTo(5, hy + 1.5); c.quadraticCurveTo(0, hy + 3, -5, hy + 1.5); c.closePath(); } c.fill(); }
+  const look = G.px > o.x ? 1 : -1;
+  c.fillStyle = '#fff'; c.beginPath(); c.ellipse(-2.7, hy - 3, 1.9, 1.5, 0, 0, 7); c.ellipse(2.7, hy - 3, 1.9, 1.5, 0, 0, 7); c.fill();
+  c.fillStyle = '#1a1410'; c.beginPath(); c.arc(-2.7 + look, hy - 3, 0.95, 0, 7); c.arc(2.7 + look, hy - 3, 0.95, 0, 7); c.fill();
+  if (b.glasses){ c.strokeStyle = '#222'; c.lineWidth = 0.8; c.strokeRect(-5, hy - 4.8, 4.4, 3.4); c.strokeRect(0.6, hy - 4.8, 4.4, 3.4); }
+  c.strokeStyle = '#3a2416'; c.lineWidth = 1; c.beginPath();
+  if (mad){ c.moveTo(-4.6, hy - 6.6); c.lineTo(-1, hy - 5.2); c.moveTo(4.6, hy - 6.6); c.lineTo(1, hy - 5.2); } else { c.moveTo(-4.4, hy - 6); c.lineTo(-1.2, hy - 6.2); c.moveTo(4.4, hy - 6); c.lineTo(1.2, hy - 6.2); }
+  c.stroke();
+  c.fillStyle = '#3a1410';
+  if (mad){ c.beginPath(); c.ellipse(0, hy + 2.6, 2.2, 1.6 + Math.abs(Math.sin(t*14)), 0, 0, 7); c.fill(); }
+  else { c.strokeStyle = '#5a2a1a'; c.beginPath(); c.arc(0, hy + 1, 2.4, 0.2, Math.PI - 0.2); c.stroke(); }
+  /* hats */
+  c.fillStyle = b.hatCol;
+  if (b.hat === 'beanie'){ c.beginPath(); c.ellipse(0, hy - 7, 7.6, 6, 0, Math.PI, 0); c.fill(); c.fillRect(-7.6, hy - 7.5, 15.2, 3); c.beginPath(); c.arc(0, hy - 13.5, 2, 0, 7); c.fill(); }
+  if (b.hat === 'cap' || b.hat === 'backcap'){ c.beginPath(); c.ellipse(0, hy - 7, 7.4, 5.4, 0, Math.PI, 0); c.fill(); const bx = b.hat === 'cap' ? look*6 : -look*6; c.beginPath(); c.ellipse(bx, hy - 7, 6, 1.6, 0, 0, 7); c.fill(); }
+  if (b.hat === 'bucket'){ c.beginPath(); c.ellipse(0, hy - 6.5, 11, 2.6, 0, 0, 7); c.fill(); c.beginPath(); c.moveTo(-6.5, hy - 6.5); c.lineTo(-5.5, hy - 13); c.lineTo(5.5, hy - 13); c.lineTo(6.5, hy - 6.5); c.closePath(); c.fill(); }
+  c.restore();
+  /* name tag */
+  c.font = '700 10px "Barlow Semi Condensed", sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle';
+  const tw = c.measureText(b.name.toUpperCase()).width + 12; c.fillStyle = mad ? 'rgba(160,40,30,.9)' : 'rgba(20,32,30,.82)';
+  c.beginPath(); if (c.roundRect) c.roundRect(o.x - tw/2, y + 12 - 70*K, tw, 15, 7.5); else c.rect(o.x - tw/2, y + 12 - 70*K, tw, 15); c.fill();
+  c.fillStyle = '#fff'; c.fillText(b.name.toUpperCase(), o.x, y + 19.5 - 70*K); c.textAlign = 'left'; c.textBaseline = 'alphabetic';
 }
 function hidingWarden(c, x, gy, sc, look, t, kind){
   const stump = kind && kind.includes('stump'), birder = kind && kind.includes('birdwatcher'), fakeStache = kind && kind.includes('mustache');
@@ -2338,6 +2433,7 @@ function draw(){
     else if (o.type === 'warden'){
       hidingWarden(c, o.x, y + 12, 0.85, G.px > o.x ? 1 : -1, G.t, o.disg);
     }
+    else if (o.type === 'bankie') drawBankie(c, o, y);
   }
   /* player wake spray */
   c.fillStyle = '#fff';
@@ -2907,7 +3003,7 @@ renderTown(); show('scTown');
 if (!S.seenIntro){
   S.seenIntro = true; save();
   openSheet(head('Welcome to Silty Creek','The river is calling') + `<div class="logoplate"><img src="${LOGO_SRC}" alt="The Silty Spoon, Stocklin Lures"></div>
-    <p style="margin:0">It's ${weekLabel()}, and the game runs on your real clock. You've got <b>$60</b>, <b>12 gallons</b> and two <b>Silty Spoon Minnow Chrome UV</b> spoons. Tap a building to walk over and go in. Grab a license at the Corner Stop before the warden finds you, and maybe a Radioactive spoon at Silty Creek Tackle, since the Nooksack runs silty. Your truck and sled are at the Boat Launch at the end of the street.</p>
+    <p style="margin:0">You're <b>Michael</b>, owner of Stocklin Lures, out to prove your Silty Spoons catch more fish than anything on the river. It's ${weekLabel()}, and the game runs on your real clock. You've got <b>$60</b>, <b>12 gallons</b> and two <b>Silty Spoon Minnow Chrome UV</b> spoons. Tap a building to walk over and go in. Grab a license at the Corner Stop before the warden finds you, and maybe a Radioactive spoon at Silty Creek Tackle, since the Nooksack runs silty. Your truck and sled are at the Boat Launch at the end of the street.</p>
     <div class="board"><b>Heads up:</b> Angry sled guys own every drift. The game warden hides in the bushes, even in town. Seals and sea lions will eat your fish right off the line on tidewater rivers. And if a purple sled with a phone on a stick pulls up, that's Rowdy Rick. He has thoughts about WDFW.</div>
     <div class="row"><button class="btn grow" id="iHelp">How to play</button><button class="btn pri grow" id="iGo">Let's go</button></div>`);
   $('#iGo').onclick = closeSheet; $('#iHelp').onclick = () => { closeSheet(); openHelp(); };
